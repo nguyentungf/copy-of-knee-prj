@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BME Rehab - Biểu đồ tiến trình</title>
+    <title>KneeROM - Biểu đồ phục hồi</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -17,50 +17,75 @@
             <div class="brand">
                 <div class="brand-mark"><span></span><span></span><span></span></div>
                 <span>Knee<span>ROM</span></span>
+                <small class="brand-live">LIVE</small>
             </div>
             
             <div class="clinic-pill">
                 <span class="avatar small">{{ user[1][0] if user[1] else 'B' }}</span>
-                <div><strong>{{ user[1] }}</strong><small>Bệnh nhân</small></div>
+                <div style="flex: 1;">
+                    <strong>{{ user[1] }}</strong>
+                    <small>Tuần {{ user[3] }} · Bệnh nhân</small>
+                </div>
+                <a href="/settings" title="Cài đặt tài khoản & Thiết bị" style="text-decoration: none; color: inherit;">
+                    <span class="dots">•••</span>
+                </a>
             </div>
             
             <nav>
-                <a href="/dashboard" class="nav-item">▣ Đo biên độ</a>
-                <a href="/my_records" class="nav-item">⌂ Hồ sơ bệnh án</a>
-                <a href="/profile" class="nav-item selected">◒ Đồ thị phục hồi</a>
-                <a href="/game" class="nav-item">⌁ Penalty 3D</a>
+                <a href="/dashboard" class="nav-item"><span class="icon">◒</span>Đo biên độ</a>
+                <a href="/my_records" class="nav-item"><span class="icon">▣</span>Hồ sơ lâm sàng</a>
+                <a href="/profile" class="nav-item selected"><span class="icon">⌁</span>Biểu đồ phục hồi</a>
+                <a href="/game" class="nav-item"><span class="icon">⚽</span>Penalty 3D</a>
+                <a href="/settings" class="nav-item"><span class="icon">⚙</span>Thiết bị & cài đặt</a>
+                <a href="/guide" class="nav-item"><span class="icon">📖</span>Hướng dẫn tập</a>
             </nav>
             
             <div class="sidebar-bottom">
-                <a href="/logout" class="nav-item danger">↪ Đăng xuất</a>
+                <a href="/help" class="nav-item"><span class="icon">?</span>Trợ giúp</a>
+                <a href="/logout" class="nav-item danger"><span class="icon">↪</span>Đăng xuất</a>
             </div>
         </aside>
 
-        <!-- ===== MAIN CONTENT ===== -->
+        <!-- ===== MAIN VIEW ===== -->
         <main>
             <header class="topbar">
-                <div class="crumb"><span>Phục hồi của tôi</span><b>/</b><strong>Đồ thị phục hồi</strong></div>
+                <button class="menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+                <div class="crumb"><span>Phục hồi của tôi</span><b>/</b><strong>Biểu đồ phục hồi</strong></div>
                 <div class="top-status">
                     <span class="week-chip">TUẦN {{ user[3] }}</span>
-                    <button class="bell">🔔<em></em></button>
+                    <a href="/dashboard" style="text-decoration: none;">
+                        <button class="btn-primary" style="padding: 8px 16px; font-size: 12px;">+ Buổi tập mới</button>
+                    </a>
                 </div>
             </header>
 
             <section class="content">
                 <div class="title-row">
                     <div>
-                        <p class="eyebrow">THEO DÕI QUÁ TRÌNH</p>
-                        <h1>Đồ thị phục hồi</h1>
-                        <p class="subtitle">So sánh góc gập gối tối đa thu thập từ Camera 3D và Cảm biến IMU qua từng ngày.</p>
+                        <p class="eyebrow">THEO DÕI QUÁ TRÌNH BIÊN ĐỘ</p>
+                        <h1>Biểu đồ phục hồi</h1>
+                        <p class="subtitle">Đối chiếu góc gập gối tối đa thu thập từ Camera AI và Cảm biến IMU qua từng ngày tập.</p>
                     </div>
                 </div>
 
-                <div class="workspace" style="grid-template-columns: 1fr;">
-                    <div class="card" style="padding: 24px; min-height: 500px; display: flex; flex-direction: column;">
-                        <h3 style="margin: 0 0 20px 0; font-size: 14px; color: #52657a;">So sánh ROM lớn nhất theo ngày (độ °)</h3>
-                        <div style="flex: 1; position: relative; min-height: 380px;">
-                            <canvas id="kneeChart"></canvas>
+                <div class="card" style="padding: 28px; min-height: 520px; display: flex; flex-direction: column;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 16px; color: var(--ink);">Xu hướng góc gập gối tối đa (Độ °)</h3>
+                            <p style="margin: 4px 0 0; font-size: 12px; color: var(--muted);">Dữ liệu ghi nhận từ các phiên đo đạc thực tế</p>
                         </div>
+                        <div style="display: flex; gap: 16px; font-size: 12px; font-weight: 600;">
+                            <span style="display: flex; align-items: center; gap: 6px; color: #074adf;">
+                                <i style="width: 10px; height: 10px; border-radius: 50%; background: #074adf; display: inline-block;"></i> Camera AI
+                            </span>
+                            <span style="display: flex; align-items: center; gap: 6px; color: #0ba360;">
+                                <i style="width: 10px; height: 10px; border-radius: 50%; background: #0ba360; display: inline-block;"></i> Cảm biến IMU
+                            </span>
+                        </div>
+                    </div>
+
+                    <div style="flex: 1; position: relative; min-height: 400px;">
+                        <canvas id="kneeChart"></canvas>
                     </div>
                 </div>
             </section>
@@ -75,18 +100,32 @@
                 labels: {{ dates | safe }},
                 datasets: [
                     {
-                        label: '📷 Camera (°)',
+                        label: '📷 Camera AI (°)',
                         data: {{ cam_angles | safe }},
-                        borderColor: '#0e6fff',
-                        backgroundColor: 'rgba(14, 111, 255, 0.08)',
-                        borderWidth: 3, pointBackgroundColor: '#0e6fff', pointRadius: 5, tension: 0.25, fill: true, spanGaps: true
+                        borderColor: '#074adf',
+                        backgroundColor: 'rgba(7, 74, 223, 0.06)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#074adf',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        tension: 0.3,
+                        fill: true,
+                        spanGaps: true
                     },
                     {
-                        label: '🦵 Cảm biến (°)',
+                        label: '🦵 Cảm biến IMU (°)',
                         data: {{ imu_angles | safe }},
-                        borderColor: '#0dba78',
-                        backgroundColor: 'rgba(13, 186, 120, 0.08)',
-                        borderWidth: 3, pointBackgroundColor: '#0dba78', pointRadius: 5, tension: 0.25, fill: true, spanGaps: true
+                        borderColor: '#0ba360',
+                        backgroundColor: 'rgba(11, 163, 96, 0.06)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#0ba360',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        tension: 0.3,
+                        fill: true,
+                        spanGaps: true
                     }
                 ]
             },
@@ -94,18 +133,18 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: { 
-                    legend: { labels: { color: '#10233e', font: { family: 'Plus Jakarta Sans', weight: '600' } } } 
+                    legend: { display: false } 
                 },
                 scales: {
                     y: { 
                         beginAtZero: true, 
                         max: 180, 
-                        grid: { color: '#e4ebf3' }, 
-                        ticks: { color: '#6d7d92', stepSize: 30, font: { family: 'DM Mono' } } 
+                        grid: { color: '#e8e4d9' }, 
+                        ticks: { color: '#52657a', stepSize: 30, font: { family: 'DM Mono' } } 
                     },
                     x: { 
-                        grid: { color: '#e4ebf3', display: false }, 
-                        ticks: { color: '#6d7d92', font: { family: 'Plus Jakarta Sans', weight: '500' } } 
+                        grid: { color: '#e8e4d9', display: false }, 
+                        ticks: { color: '#52657a', font: { family: 'Plus Jakarta Sans', weight: '600' } } 
                     }
                 }
             }

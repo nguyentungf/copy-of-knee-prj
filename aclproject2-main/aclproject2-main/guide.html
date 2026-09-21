@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KneeROM - Hướng Dẫn Tập Luyện Y Khoa</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='rehab.css') }}">
+    <script src="{{ url_for('static', filename='rehab.js') }}"></script>
+    <style>
+        .guide-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        @media (max-width: 992px) {
+            .guide-grid { grid-template-columns: 1fr; }
+        }
+        .phase-card {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 22px;
+            margin-bottom: 16px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .phase-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16,35,62,0.06);
+        }
+        .phase-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .phase-badge {
+            font-size: 11px;
+            font-weight: 800;
+            padding: 5px 10px;
+            border-radius: 20px;
+            background: #eaf2ff;
+            color: var(--blue);
+            font-family: 'DM Mono', monospace;
+        }
+        .rom-target {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--ink);
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .rom-target span {
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+        .guide-list {
+            padding-left: 18px;
+            margin: 10px 0 0;
+            font-size: 13px;
+            color: #52657a;
+            line-height: 1.6;
+        }
+        .step-box {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+        .step-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--blue);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+            font-size: 14px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(14,111,255,0.3);
+        }
+        .step-text h4 {
+            margin: 0 0 4px;
+            font-size: 15px;
+            color: var(--ink);
+        }
+        .step-text p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark"><span></span><span></span><span></span></div>
+                <span>Knee<span>ROM</span></span>
+                <small class="brand-live">LIVE</small>
+            </div>
+            
+            <div class="clinic-pill" style="position: relative;">
+                <span class="avatar small">{{ name[0] if name else 'B' }}</span>
+                <div style="flex: 1;"><strong>{{ name }}</strong><small>Bệnh nhân</small></div>
+                <a href="/settings" style="text-decoration: none; color: inherit;"><span class="dots" title="Cài đặt">⚙</span></a>
+            </div>
+            
+            <nav>
+                <a href="/dashboard" class="nav-item">▣ Đo biên độ</a>
+                <a href="/my_records" class="nav-item">⌂ Hồ sơ bệnh án</a>
+                <a href="/profile" class="nav-item">◒ Đồ thị phục hồi</a>
+                <a href="/game" class="nav-item">⌁ Penalty 3D</a>
+                <a href="/settings" class="nav-item">⚙ Cài đặt & Thiết bị</a>
+                <a href="/guide" class="nav-item selected">📖 Hướng dẫn tập</a>
+            </nav>
+            
+            <div class="sidebar-bottom">
+                <a href="/help" class="nav-item"><span class="icon">?</span>Trợ giúp</a>
+                <a href="/logout" class="nav-item danger">↪ Đăng xuất</a>
+            </div>
+        </aside>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <main>
+            <header class="topbar">
+                <div class="crumb">
+                    <span>Phục hồi của tôi</span>
+                    <b>/</b>
+                    <strong>Hướng dẫn tập luyện y khoa</strong>
+                </div>
+                <div class="top-status">
+                    <span class="week-chip">TUẦN {{ week }}</span>
+                    <span class="connection camera"><i></i>Camera · 30 FPS</span>
+                    <a href="/settings" class="btn-secondary" style="padding: 6px 12px; font-size: 12px; text-decoration: none;">⚙ Cài đặt</a>
+                </div>
+            </header>
+
+            <section class="content">
+                <div class="title-row">
+                    <div>
+                        <p class="eyebrow">CHUẨN Y KHOA PHỤC HỒI CHỨC NĂNG ACL</p>
+                        <h1>Hướng Dẫn Tập Luyện & Tiêu Chuẩn ROM</h1>
+                        <p class="subtitle">Quy trình thiết lập thiết bị đúng góc nhìn và lộ trình mục tiêu góc gấp duỗi khớp gối theo tuần.</p>
+                    </div>
+                </div>
+
+                <div class="guide-grid">
+                    <!-- CỘT 1: THIẾT LẬP THIẾT BỊ ĐÚNG CÁCH -->
+                    <div>
+                        <div class="card" style="padding: 26px; margin-bottom: 24px;">
+                            <h2 style="font-size: 18px; margin: 0 0 18px;">📐 Quy trình thiết lập đo góc chuẩn</h2>
+
+                            <div class="step-box">
+                                <div class="step-circle">1</div>
+                                <div class="step-text">
+                                    <h4>Đặt góc Camera ngang tầm gối</h4>
+                                    <p>Đặt Webcam hoặc Camera laptop cách vị trí ngồi 1.5m - 2m. Đảm bảo toàn bộ từ hông xuống bàn chân nằm trọn trong khung hình.</p>
+                                </div>
+                            </div>
+
+                            <div class="step-box">
+                                <div class="step-circle">2</div>
+                                <div class="step-text">
+                                    <h4>Đeo cảm biến IMU chắc chắn</h4>
+                                    <p>Cảm biến đo góc đùi gắn ở mặt ngoài đùi (cách khớp gối 10cm). Cảm biến cẳng chân gắn dọc xương chày. Tránh để cảm biến lỏng lẻo.</p>
+                                </div>
+                            </div>
+
+                            <div class="step-box">
+                                <div class="step-circle">3</div>
+                                <div class="step-text">
+                                    <h4>Hiệu chuẩn Zero (Góc 0°)</h4>
+                                    <p>Duỗi thẳng chân hoàn toàn song song với mặt phẳng, bấm phím <b>C</b> hoặc nhấn nút "Zero 0°" trên màn hình trước khi bắt đầu bài gập.</p>
+                                </div>
+                            </div>
+
+                            <div class="step-box">
+                                <div class="step-circle">4</div>
+                                <div class="step-text">
+                                    <h4>Gập chân từ từ và giữ 3 giây</h4>
+                                    <p>Gập gối chậm rãi đến giới hạn chịu đựng (không để quá đau nhói). Giữ yên 3 giây để thuật toán Auto-Hold tự động ghi nhận dữ liệu.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card" style="padding: 26px; background: linear-gradient(145deg, #0e6fff, #0a52be); color: white;">
+                            <h3 style="margin: 0 0 8px; font-size: 16px;">💡 Lưu ý quan trọng cho bệnh nhân ACL</h3>
+                            <p style="margin: 0; font-size: 13px; line-height: 1.6; opacity: 0.95;">
+                                Tuyệt đối không cố ép gập gối vượt quá chỉ định của bác sĩ trong 2 tuần đầu sau phẫu thuật. Sau mỗi buổi tập, hãy chườm lạnh từ 15-20 phút để giảm phù nề và kiểm soát cơn đau.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- CỘT 2: TIÊU CHUẨN ROM THEO TỪNG GIAI ĐOẠN -->
+                    <div>
+                        <div class="card" style="padding: 26px;">
+                            <h2 style="font-size: 18px; margin: 0 0 16px;">🎯 Lộ trình Mục tiêu Biên độ (ROM)</h2>
+
+                            <!-- GIAI ĐOẠN 1 -->
+                            <div class="phase-card" style="border-left: 4px solid var(--blue);">
+                                <div class="phase-header">
+                                    <strong style="color: var(--blue);">Giai đoạn 1 (Tuần 1 – Tuần 2)</strong>
+                                    <span class="phase-badge">BẢO VỆ MẢNH GHÉP</span>
+                                </div>
+                                <div class="rom-target">
+                                    0° – 90° <span>Mục tiêu gập</span>
+                                </div>
+                                <ul class="guide-list">
+                                    <li>Kiểm soát phù nề và bảo vệ mảnh ghép dây chằng mới tái tạo.</li>
+                                    <li>Kích hoạt cơ tứ đầu đùi bằng bài tập gồng cơ tĩnh (Isometric).</li>
+                                    <li><b>Cấm kỵ:</b> Không ép gập quá 90° để tránh kéo dãn mảnh ghép.</li>
+                                </ul>
+                            </div>
+
+                            <!-- GIAI ĐOẠN 2 -->
+                            <div class="phase-card" style="border-left: 4px solid var(--green);">
+                                <div class="phase-header">
+                                    <strong style="color: var(--green);">Giai đoạn 2 (Tuần 3 – Tuần 6)</strong>
+                                    <span class="phase-badge" style="background:#eaf7f2; color:#0dba78;">TĂNG ROM & LỰC CƠ</span>
+                                </div>
+                                <div class="rom-target">
+                                    90° – 125° <span>Mục tiêu gập</span>
+                                </div>
+                                <ul class="guide-list">
+                                    <li>Bắt đầu đạp xe đạp lực cản nhẹ tại chỗ.</li>
+                                    <li>Tập bài tập Squat nông (dưới 45°), bài tập bước cầu thang thấp.</li>
+                                    <li>Phục hồi dáng đi bình thường không cần nạng hỗ trợ.</li>
+                                </ul>
+                            </div>
+
+                            <!-- GIAI ĐOẠN 3 -->
+                            <div class="phase-card" style="border-left: 4px solid var(--cyan);">
+                                <div class="phase-header">
+                                    <strong style="color: #08b7bf;">Giai đoạn 3 (Tuần 7 – Tuần 12+)</strong>
+                                    <span class="phase-badge" style="background:#e0f9fb; color:#08b7bf;">PHỤC HỒI TOÀN DIỆN</span>
+                                </div>
+                                <div class="rom-target">
+                                    125° – 135°+ <span>Hoàn nguyên biên độ</span>
+                                </div>
+                                <ul class="guide-list">
+                                    <li>Lấy lại hoàn toàn biên độ khớp gối đối bên lành.</li>
+                                    <li>Tập thăng bằng nâng cao (Single leg balance, Bosu ball).</li>
+                                    <li>Chạy bộ nhẹ nhàng trên máy chạy bộ (Treadmill) theo đánh giá bác sĩ.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KneeROM - Trung tâm Trợ giúp & FAQ</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='rehab.css') }}">
+    <script src="{{ url_for('static', filename='rehab.js') }}"></script>
+    <style>
+        .faq-item {
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .faq-item:hover {
+            border-color: var(--blue);
+            transform: translateY(-1px);
+        }
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+        .faq-answer {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #52657a;
+            line-height: 1.6;
+        }
+        .contact-box {
+            background: #f0f3ff;
+            border: 1px solid #dce5ff;
+            border-radius: 20px;
+            padding: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark"><span></span><span></span><span></span></div>
+                <span>Knee<span>ROM</span></span>
+                <small class="brand-live">LIVE</small>
+            </div>
+            
+            <div class="clinic-pill">
+                <span class="avatar small">{{ name[0] if name else 'B' }}</span>
+                <div style="flex: 1;">
+                    <strong>{{ name }}</strong>
+                    <small>Tuần {{ week }} · Bệnh nhân</small>
+                </div>
+                <a href="/settings" title="Cài đặt tài khoản & Thiết bị" style="text-decoration: none; color: inherit;">
+                    <span class="dots">•••</span>
+                </a>
+            </div>
+            
+            <nav>
+                <a href="/dashboard" class="nav-item"><span class="icon">◒</span>Đo biên độ</a>
+                <a href="/my_records" class="nav-item"><span class="icon">▣</span>Hồ sơ lâm sàng</a>
+                <a href="/profile" class="nav-item"><span class="icon">⌁</span>Biểu đồ phục hồi</a>
+                <a href="/game" class="nav-item"><span class="icon">⚽</span>Penalty 3D</a>
+                <a href="/settings" class="nav-item"><span class="icon">⚙</span>Thiết bị & cài đặt</a>
+                <a href="/guide" class="nav-item"><span class="icon">📖</span>Hướng dẫn tập</a>
+            </nav>
+            
+            <div class="sidebar-bottom">
+                <a href="/help" class="nav-item selected"><span class="icon">?</span>Trợ giúp</a>
+                <a href="/logout" class="nav-item danger"><span class="icon">↪</span>Đăng xuất</a>
+            </div>
+        </aside>
+
+        <!-- ===== MAIN VIEW ===== -->
+        <main>
+            <header class="topbar">
+                <button class="menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+                <div class="crumb"><span>Phục hồi của tôi</span><b>/</b><strong>Trung tâm Trợ giúp</strong></div>
+                <div class="top-status">
+                    <span class="week-chip">TUẦN {{ week }}</span>
+                    <a href="/guide" style="text-decoration: none;">
+                        <button class="btn-secondary" style="padding: 8px 16px; font-size: 12px;">📖 Hướng dẫn tập</button>
+                    </a>
+                </div>
+            </header>
+
+            <section class="content">
+                <div class="title-row">
+                    <div>
+                        <p class="eyebrow">HỖ TRỢ KỸ THUẬT & Y KHOA</p>
+                        <h1>Trung tâm Trợ giúp & Câu hỏi thường gặp</h1>
+                        <p class="subtitle">Giải đáp các thắc mắc về kết nối thiết bị cảm biến, camera và các vấn đề phục hồi chức năng.</p>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 24px;">
+                    <!-- FAQ LIST -->
+                    <div>
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>Camera không nhận diện được khớp chân?</span>
+                                <span>▾</span>
+                            </div>
+                            <div class="faq-answer">
+                                Hãy đảm bảo phòng tập có đủ ánh sáng và phông nền phía sau chân tương đối gọn gàng. Mặc quần đùi ngắn trên gối để MediaPipe AI có thể bắt điểm mốc xương bánh chè chính xác nhất.
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>Cảm biến IMU báo "Mất kết nối" hoặc rung số (Jitter)?</span>
+                                <span>▾</span>
+                            </div>
+                            <div class="faq-answer">
+                                1. Nếu dùng cáp USB: Vào mục "Thiết bị & cài đặt" và chọn đúng cổng COM của ESP32.<br>
+                                2. Nếu dùng WiFi: Đảm bảo máy tính đã kết nối vào mạng WiFi <code>ACL_Knee</code> (mật khẩu <code>12345678</code>).<br>
+                                3. Bấm phím <b>F</b> để Reset bộ lọc chống rung Jitter.
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>Tôi nên cập nhật "Tuần phục hồi" ở đâu?</span>
+                                <span>▾</span>
+                            </div>
+                            <div class="faq-answer">
+                                Bạn có thể truy cập mục <b>⚙ Thiết bị & cài đặt</b> từ thanh Sidebar, nhập số tuần hiện tại của mình (ví dụ từ tuần 2 sang tuần 3) và nhấn "Lưu cập nhật tiến độ". Hệ thống sẽ tự động điều chỉnh chỉ số ROM mục tiêu trên bảng điều khiển.
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                <span>Làm thế nào để tính năng Auto-Hold lưu góc tự động?</span>
+                                <span>▾</span>
+                            </div>
+                            <div class="faq-answer">
+                                Khi bạn gập gối đến một góc nhất định và giữ yên chân trong vòng 3 giây, hệ thống sẽ phát hiện độ ổn định và tự động lưu kết quả vào cơ sở dữ liệu mà không cần bạn phải với tay bấm chuột hay bấm phím Space.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CONTACT SUPPORT CARD -->
+                    <div>
+                        <div class="contact-box">
+                            <h3 style="margin: 0 0 8px; font-size: 16px; color: var(--blue);">Hỗ trợ Bác sĩ & Kỹ thuật viên</h3>
+                            <p style="margin: 0 0 16px; font-size: 13px; color: #52657a; line-height: 1.6;">
+                                Nếu bạn gặp khó khăn trong quá trình tập luyện hoặc có bất kỳ biểu hiện sưng đau bất thường, hãy liên hệ ngay với đội ngũ y tế.
+                            </p>
+                            <div style="margin-bottom: 12px; font-size: 13px;">
+                                <b>Đường dây nóng:</b> 1800-REHAB (Miễn phí)
+                            </div>
+                            <div style="margin-bottom: 18px; font-size: 13px;">
+                                <b>Khoa Phục hồi chức năng:</b> Bệnh viện Y học Thể thao
+                            </div>
+                            <a href="/settings" class="btn-primary" style="width: 100%;">
+                                Kiểm tra cấu hình phần cứng
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+

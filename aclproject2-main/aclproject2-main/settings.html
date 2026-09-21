@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KneeROM - Cài đặt & Quản lý Thiết bị</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='rehab.css') }}">
+    <script src="{{ url_for('static', filename='rehab.js') }}"></script>
+    <style>
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        @media (max-width: 992px) {
+            .settings-grid { grid-template-columns: 1fr; }
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #52657a;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            font-size: 14px;
+            color: var(--ink);
+            background: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(14,111,255,0.15);
+            outline: none;
+        }
+        .form-group small {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 5px;
+        }
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: #eaf7f2;
+            color: #0dba78;
+        }
+        .badge-pill.warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        .badge-pill.blue {
+            background: #eaf2ff;
+            color: var(--blue);
+        }
+        .mode-selector {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .mode-card {
+            flex: 1;
+            border: 2px solid var(--line);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            background: #fff;
+        }
+        .mode-card.active {
+            border-color: var(--blue);
+            background: #f0f6ff;
+        }
+        .mode-card strong {
+            display: block;
+            font-size: 14px;
+            color: var(--ink);
+            margin-bottom: 4px;
+        }
+        .mode-card p {
+            margin: 0;
+            font-size: 11px;
+            color: var(--muted);
+        }
+        .command-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 14px;
+        }
+        .cmd-btn {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .cmd-btn:hover {
+            background: #e2e8f0;
+            border-color: var(--blue);
+            color: var(--blue);
+        }
+        .advice-box {
+            background: #fefce8;
+            border: 1px solid #fef08a;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .advice-box strong {
+            color: #854d0e;
+            font-size: 13px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .advice-box p {
+            margin: 0;
+            font-size: 12px;
+            color: #713f12;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark"><span></span><span></span><span></span></div>
+                <span>Knee<span>ROM</span></span>
+                <small class="brand-live">LIVE</small>
+            </div>
+            
+            <div class="clinic-pill" style="position: relative;">
+                <span class="avatar small">{{ name[0] if name else 'B' }}</span>
+                <div style="flex: 1;"><strong>{{ name }}</strong><small>Bệnh nhân</small></div>
+                <a href="/settings" style="text-decoration: none; color: inherit;"><span class="dots" title="Cài đặt">⚙</span></a>
+            </div>
+            
+            <nav>
+                <a href="/dashboard" class="nav-item">▣ Đo biên độ</a>
+                <a href="/my_records" class="nav-item">⌂ Hồ sơ bệnh án</a>
+                <a href="/profile" class="nav-item">◒ Đồ thị phục hồi</a>
+                <a href="/game" class="nav-item">⌁ Penalty 3D</a>
+                <a href="/settings" class="nav-item selected">⚙ Cài đặt & Thiết bị</a>
+                <a href="/guide" class="nav-item">📖 Hướng dẫn tập</a>
+            </nav>
+            
+            <div class="sidebar-bottom">
+                <a href="/help" class="nav-item"><span class="icon">?</span>Trợ giúp</a>
+                <a href="/logout" class="nav-item danger">↪ Đăng xuất</a>
+            </div>
+        </aside>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <main>
+            <header class="topbar">
+                <div class="crumb">
+                    <span>Phục hồi của tôi</span>
+                    <b>/</b>
+                    <strong>Cài đặt & Quản lý thiết bị</strong>
+                </div>
+                <div class="top-status">
+                    <span class="week-chip">TUẦN {{ week }}</span>
+                    <span class="connection camera"><i></i>Camera · 30 FPS</span>
+                    <button class="bell" id="bellBtn">🔔<em></em></button>
+                </div>
+            </header>
+
+            <section class="content">
+                <div class="title-row">
+                    <div>
+                        <p class="eyebrow">TRUNG TÂM CẤU HÌNH & QUẢN TRỊ</p>
+                        <h1>Cài đặt & Quản lý Thiết bị</h1>
+                        <p class="subtitle">Tự điều chỉnh tuần phục hồi sau phẫu thuật, cấu hình kết nối cảm biến IMU và bảo mật tài khoản.</p>
+                    </div>
+                </div>
+
+                <!-- NOTIFICATION DROPDOWN -->
+                <div id="notif-dropdown" style="display:none; position:absolute; top:70px; right:34px; width:320px; background:#fff; border:1px solid #e4ebf3; border-radius:14px; box-shadow:0 12px 35px rgba(16,35,62,0.12); z-index:100; padding:18px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e4ebf3; padding-bottom:10px; margin-bottom:12px;">
+                        <h4 style="margin:0; font-size:14px; color:var(--ink);">Thông báo y tế</h4>
+                        <span class="badge-pill blue">Hôm nay</span>
+                    </div>
+                    <div id="notif-list" style="max-height:300px; overflow-y:auto; font-size:12px; color:#6d7d92;">
+                        Đang tải...
+                    </div>
+                </div>
+
+                <div class="settings-grid">
+                    <!-- CỘT 1: HỒ SƠ & TIẾN ĐỘ PHỤC HỒI -->
+                    <div>
+                        <div class="card" style="padding: 26px; margin-bottom: 24px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                <div>
+                                    <h2 style="font-size: 17px; margin: 0;">Hồ sơ & Tiến độ phục hồi</h2>
+                                    <p style="font-size: 12px; color: var(--muted); margin: 4px 0 0;">Cập nhật tuần điều trị để hệ thống điều chỉnh bài tập phù hợp</p>
+                                </div>
+                                <span class="badge-pill">Giai đoạn {{ '1' if week <= 2 else ('2' if week <= 6 else '3') }}</span>
+                            </div>
+
+                            {% if doctor_advice %}
+                            <div class="advice-box">
+                                <strong>🩺 Lời dặn từ Bác sĩ phụ trách:</strong>
+                                <p>{{ doctor_advice }}</p>
+                            </div>
+                            {% endif %}
+
+                            <form id="profileForm">
+                                <div class="form-group">
+                                    <label for="pName">Họ và tên bệnh nhân</label>
+                                    <input type="text" id="pName" name="name" value="{{ name }}" required>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                                    <div class="form-group">
+                                        <label for="pAge">Tuổi</label>
+                                        <input type="number" id="pAge" name="age" value="{{ age }}" min="1" max="120" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="pWeek">Tuần phục hồi hiện tại</label>
+                                        <input type="number" id="pWeek" name="week" value="{{ week }}" min="0" max="104" required>
+                                        <small>Mỗi tuần hệ thống sẽ tăng chỉ số ROM mục tiêu.</small>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;">
+                                    Lưu cập nhật tiến độ
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- BẢO MẬT & ĐỔI MẬT KHẨU -->
+                        <div class="card" style="padding: 26px;">
+                            <h2 style="font-size: 17px; margin: 0 0 6px;">Bảo mật & Đổi mật khẩu</h2>
+                            <p style="font-size: 12px; color: var(--muted); margin: 0 0 20px;">Mật khẩu mới yêu cầu tối thiểu 10 ký tự</p>
+
+                            <form id="passwordForm">
+                                <div class="form-group">
+                                    <label for="pPassword">Mật khẩu mới</label>
+                                    <input type="password" id="pPassword" name="password" placeholder="Nhập ít nhất 10 ký tự..." minlength="10" required>
+                                    <small>Để trống nếu bạn không có nhu cầu đổi mật khẩu.</small>
+                                </div>
+                                <button type="submit" class="btn-secondary" style="width: 100%;">
+                                    Cập nhật mật khẩu mới
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- CỘT 2: TRUNG TÂM PHẦN CỨNG & CẢM BIẾN IMU -->
+                    <div>
+                        <div class="card" style="padding: 26px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                <div>
+                                    <h2 style="font-size: 17px; margin: 0;">Quản lý Cảm biến IMU</h2>
+                                    <p style="font-size: 12px; color: var(--muted); margin: 4px 0 0;">Cấu hình cổng giao tiếp Serial USB hoặc WiFi ESP32</p>
+                                </div>
+                                <span class="badge-pill {{ 'warning' if imu_mode == 'wifi' else 'blue' }}" id="currentModeBadge">
+                                    {{ '📶 WiFi' if imu_mode == 'wifi' else '🔌 USB Serial' }}
+                                </span>
+                            </div>
+
+                            <label style="font-size: 12px; font-weight: 700; color: #52657a; display: block; margin-bottom: 8px; text-transform: uppercase;">
+                                Chế độ kết nối IMU
+                            </label>
+                            <div class="mode-selector">
+                                <div class="mode-card {{ 'active' if imu_mode != 'wifi' else '' }}" id="cardSerial" onclick="switchImuMode('serial')">
+                                    <strong>🔌 Cáp USB COM</strong>
+                                    <p>Kết nối trực tiếp qua dây cáp USB (độ trễ thấp & ổn định)</p>
+                                </div>
+                                <div class="mode-card {{ 'active' if imu_mode == 'wifi' else '' }}" id="cardWifi" onclick="switchImuMode('wifi')">
+                                    <strong>📶 WiFi (ACL_Knee)</strong>
+                                    <p>Kết nối không dây qua mạng phát từ ESP32</p>
+                                </div>
+                            </div>
+
+                            <!-- USB SERIAL SECTION -->
+                            <div id="serialBox" style="display: {{ 'none' if imu_mode == 'wifi' else 'block' }}; margin-bottom: 20px; background: #f8fafc; border: 1px solid var(--line); border-radius: 12px; padding: 18px;">
+                                <div class="form-group" style="margin-bottom: 12px;">
+                                    <label for="portSelect">Danh sách cổng COM nhận diện</label>
+                                    <div style="display: flex; gap: 8px;">
+                                        <select id="portSelect" style="flex: 1;">
+                                            <option value="">Đang quét cổng COM...</option>
+                                        </select>
+                                        <button type="button" class="btn-secondary" onclick="loadComPorts()" style="padding: 10px 14px;" title="Quét lại">🔄</button>
+                                    </div>
+                                    <small id="portInfo">Tự động nhận diện thiết bị CH340/CP2102 của ESP32</small>
+                                </div>
+                                <div style="display: flex; gap: 8px;">
+                                    <button type="button" class="btn-primary" onclick="connectSelectedPort()" style="flex: 1; padding: 10px;">
+                                        Kết nối cổng này
+                                    </button>
+                                    <button type="button" class="btn-secondary" onclick="reconnectImuDevice()" style="flex: 1; padding: 10px;">
+                                        Thử kết nối lại
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- WIFI SECTION -->
+                            <div id="wifiBox" style="display: {{ 'block' if imu_mode == 'wifi' else 'none' }}; margin-bottom: 20px; background: #f8fafc; border: 1px solid var(--line); border-radius: 12px; padding: 18px;">
+                                <p style="margin: 0 0 10px; font-size: 13px; color: var(--ink);">
+                                    <b>Mạng WiFi kết nối:</b> <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">ACL_Knee</code>
+                                </p>
+                                <p style="margin: 0 0 14px; font-size: 12px; color: var(--muted);">
+                                    Mật khẩu mặc định: <code style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px;">12345678</code> | IP: <code>{{ imu_host }}</code>
+                                </p>
+                                <button type="button" class="btn-primary" onclick="reconnectImuDevice()" style="width: 100%; padding: 10px;">
+                                    Bắt buộc kết nối lại WiFi ESP32
+                                </button>
+                            </div>
+
+                            <!-- LỆNH HIỆU CHUẨN CẢM BIẾN (CALIBRATION COMMANDS) -->
+                            <label style="font-size: 12px; font-weight: 700; color: #52657a; display: block; margin-bottom: 6px; text-transform: uppercase;">
+                                Lệnh hiệu chuẩn nhanh ESP32
+                            </label>
+                            <div class="command-bar">
+                                <button type="button" class="cmd-btn" onclick="sendCmd('C')">🎯 C: Zero mốc 0°</button>
+                                <button type="button" class="cmd-btn" onclick="sendCmd('F')">⚡ F: Reset Lọc Jitter</button>
+                                <button type="button" class="cmd-btn" onclick="sendCmd('L')">🦵 L: Chọn Chân Trái</button>
+                                <button type="button" class="cmd-btn" onclick="sendCmd('R')">🦵 R: Chọn Chân Phải</button>
+                            </div>
+
+                            <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--line);">
+                                <h3 style="font-size: 13px; color: #52657a; margin: 0 0 8px;">Kiểm tra luồng Camera AI</h3>
+                                <p style="font-size: 12px; color: var(--muted); margin: 0 0 12px;">
+                                    Camera AI sử dụng MediaPipe Pose Tracking để ước lượng góc đùi - cẳng chân thời gian thực.
+                                </p>
+                                <a href="/dashboard" class="btn-secondary" style="display: block; text-align: center; font-size: 13px;">
+                                    Vào Bảng điều khiển để mở Camera
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // --- NOTIFICATION BELL TOGGLE ---
+        const bellBtn = document.getElementById('bellBtn');
+        const notifDropdown = document.getElementById('notif-dropdown');
+
+        bellBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const isOpen = notifDropdown.style.display === 'block';
+            notifDropdown.style.display = isOpen ? 'none' : 'block';
+            if (!isOpen) {
+                try {
+                    const res = await Rehab.api('/api/notifications');
+                    const list = document.getElementById('notif-list');
+                    if (!res.notifications || res.notifications.length === 0) {
+                        list.innerHTML = '<p style="text-align:center; padding:12px;">Không có thông báo mới.</p>';
+                    } else {
+                        list.innerHTML = res.notifications.map(n => `
+                            <div style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid #f0f3f6;">
+                                <strong style="display:block; color:${n.type==='doctor'?'#0e6fff':'#0dba78'}; font-size:12px;">${n.title}</strong>
+                                <span style="font-size:12px; line-height:1.4; color:#334155;">${n.message}</span>
+                            </div>
+                        `).join('');
+                    }
+                } catch (err) {
+                    document.getElementById('notif-list').innerHTML = '<p style="color:#ef4444;">Lỗi tải thông báo.</p>';
+                }
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#notif-dropdown') && !e.target.closest('#bellBtn')) {
+                notifDropdown.style.display = 'none';
+            }
+        });
+
+        // --- PROFILE UPDATE FORM ---
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const formData = new FormData(e.target);
+            try {
+                btn.disabled = true;
+                btn.textContent = 'Đang lưu...';
+                const res = await Rehab.api('/settings/save', {
+                    method: 'POST',
+                    body: formData
+                });
+                if (res.success) {
+                    Rehab.notify(res.message || 'Đã cập nhật tiến độ thành công!', 'info');
+                    setTimeout(() => location.reload(), 800);
+                }
+            } catch (err) {
+                Rehab.notify(err.message, 'error');
+                btn.disabled = false;
+                btn.textContent = 'Lưu cập nhật tiến độ';
+            }
+        });
+
+        // --- PASSWORD UPDATE FORM ---
+        document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const formData = new FormData(e.target);
+            try {
+                btn.disabled = true;
+                btn.textContent = 'Đang đổi...';
+                const res = await Rehab.api('/settings/save', {
+                    method: 'POST',
+                    body: formData
+                });
+                if (res.success) {
+                    Rehab.notify('Đổi mật khẩu thành công!', 'info');
+                    e.target.reset();
+                }
+            } catch (err) {
+                Rehab.notify(err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Cập nhật mật khẩu mới';
+            }
+        });
+
+        // --- IMU MODE SWITCHING ---
+        async function switchImuMode(mode) {
+            try {
+                const res = await Rehab.api('/set_imu_mode/' + mode, { method: 'POST' });
+                if (res.success) {
+                    document.getElementById('cardSerial').classList.toggle('active', mode === 'serial');
+                    document.getElementById('cardWifi').classList.toggle('active', mode === 'wifi');
+                    document.getElementById('serialBox').style.display = mode === 'serial' ? 'block' : 'none';
+                    document.getElementById('wifiBox').style.display = mode === 'wifi' ? 'block' : 'none';
+                    document.getElementById('currentModeBadge').textContent = mode === 'wifi' ? '📶 WiFi' : '🔌 USB Serial';
+                    document.getElementById('currentModeBadge').className = 'badge-pill ' + (mode === 'wifi' ? 'warning' : 'blue');
+                    Rehab.notify('Đã chuyển sang chế độ: ' + mode.toUpperCase(), 'info');
+                    if (mode === 'serial') loadComPorts();
+                }
+            } catch (err) {
+                Rehab.notify(err.message, 'error');
+            }
+        }
+
+        // --- COM PORTS SCANNER ---
+        async function loadComPorts() {
+            const select = document.getElementById('portSelect');
+            select.innerHTML = '<option>Đang quét cổng COM...</option>';
+            try {
+                const data = await Rehab.api('/imu_ports');
+                select.innerHTML = '';
+                if (!data.ports || data.ports.length === 0) {
+                    select.innerHTML = '<option value="">(Không tìm thấy thiết bị COM nào)</option>';
+                } else {
+                    data.ports.forEach(p => {
+                        const opt = document.createElement('option');
+                        opt.value = p.device;
+                        opt.textContent = `${p.device} — ${p.desc}`;
+                        if (p.device === data.current) opt.selected = true;
+                        select.appendChild(opt);
+                    });
+                }
+            } catch (err) {
+                select.innerHTML = '<option value="">Lỗi quét cổng COM</option>';
+            }
+        }
+
+        async function connectSelectedPort() {
+            const port = document.getElementById('portSelect').value;
+            if (!port) {
+                Rehab.notify('Vui lòng chọn một cổng COM hợp lệ', 'error');
+                return;
+            }
+            try {
+                const res = await Rehab.api('/imu_connect/' + encodeURIComponent(port), { method: 'POST' });
+                Rehab.notify('Đang kết nối tới ' + (res.port || port), 'info');
+            } catch (err) {
+                Rehab.notify(err.message, 'error');
+            }
+        }
+
+        async function reconnectImuDevice() {
+            try {
+                await Rehab.api('/imu_reconnect', { method: 'POST' });
+                Rehab.notify('Đang thiết lập lại kết nối cảm biến...', 'info');
+            } catch (err) {
+                Rehab.notify(err.message, 'error');
+            }
+        }
+
+        async function sendCmd(cmd) {
+            try {
+                const res = await Rehab.api('/imu_cmd/' + cmd, { method: 'POST' });
+                Rehab.notify(res.message || 'Đã gửi lệnh: ' + cmd, 'info');
+            } catch (err) {
+                Rehab.notify(err.message, 'error');
+            }
+        }
+
+        // Tự động load danh sách cổng nếu đang ở chế độ serial
+        document.addEventListener('DOMContentLoaded', () => {
+            if ('{{ imu_mode }}' !== 'wifi') {
+                loadComPorts();
+            }
+        });
+    </script>
+</body>
+</html>
+

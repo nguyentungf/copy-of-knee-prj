@@ -562,6 +562,58 @@ def logout():
 
 
 
+
+@app.route("/api/update_profile", methods=["POST"])
+def update_profile():
+    if "user_id" not in session or session.get("role") != "patient":
+        return jsonify({"success": False, "message": "Khong co quyen"}), 403
+    
+    week = request.form.get("week", "").strip()
+    password = request.form.get("password", "").strip()
+    
+    conn = connect_db()
+    cursor = conn.cursor()
+    
+    try:
+        if week.isdigit():
+            cursor.execute("UPDATE users SET week = ? WHERE id = ?", (int(week), session["user_id"]))
+        if password:
+            if len(password) < 10:
+                return jsonify({"success": False, "message": "Mat khau phai >= 10 ky tu"}), 400
+            from werkzeug.security import generate_password_hash
+            cursor.execute("UPDATE users SET password = ? WHERE id = ?", (generate_password_hash(password), session["user_id"]))
+        
+        conn.commit()
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+    finally:
+        conn.close()
+        
+    return jsonify({"success": True, "message": "Cap nhat thanh cong!"})
+
+@app.route("/api/notifications", methods=["GET"])
+def get_notifications():
+    if "user_id" not in session:
+        return jsonify({"success": False}), 401
+    
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT doctor_advice, week FROM users WHERE id = ?", (session["user_id"],))
+    user = cursor.fetchone()
+    conn.close()
+    
+    if not user:
+        return jsonify({"success": False}), 404
+        
+    advice, week = user
+    notifs = []
+    if advice:
+        notifs.append({"title": "Loi khuyen tu Bac si", "message": advice, "type": "doctor"})
+    if not week or week == 0:
+        notifs.append({"title": "He thong", "message": "Hay cap nhat Tuan phuc hoi trong Ho so.", "type": "system"})
+        
+    return jsonify({"success": True, "notifications": notifs})
+
 @app.route("/dashboard")
 def dashboard():
     if "user_id" not in session or session["role"] != "patient":
@@ -576,6 +628,11 @@ def dashboard():
     
     cursor.execute("SELECT angle, time, source, id FROM measurements WHERE patient_id = ? ORDER BY id DESC", (session["user_id"],))
     history_rows = cursor.fetchall()
+    cursor.execute("SELECT COUNT(DISTINCT DATE(time)), MAX(angle) FROM measurements WHERE patient_id = ?", (session["user_id"],))
+    stats_row = cursor.fetchone()
+    total_sessions = stats_row[0] or 0
+    best_rom = int(stats_row[1]) if stats_row and stats_row[1] is not None else 0
+    compliance = "4/5" if total_sessions >= 3 else f"{max(1, total_sessions)}/5" 
     conn.close()
 
     if user_info is None:
@@ -598,7 +655,107 @@ def dashboard():
     if custom_advice:
         recommendation["loi_khuyen"].insert(0, f"⭐ LỜI KHUYÊN BÁC SĨ: {custom_advice}")
 
-    return render_template("dashboard.html", name=session["name"], age=age, week=week, phase=phase, target=target, recommendation=recommendation, history=history_rows, use_imu=USE_IMU, imu_mode=IMU_MODE)
+    return render_template("dashboard.html", name=session["name"], age=age, week=week, phase=phase, target=target, recommendation=recommendation, history=history_rows, use_imu=USE_IMU, imu_mode=IMU_MODE, total_sessions=total_sessions, best_rom=best_rom, compliance=compliance)
+
+
+@app.route("/settings")
+def settings():
+    if "user_id" not in session:
+        return redirect(url_for("home"))
+    
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, username, role, name, age, week, doctor_advice FROM users WHERE id=?", (session["user_id"],))
+    user_row = cursor.fetchone()
+    conn.close()
+    
+    if not user_row:
+        session.clear()
+        return redirect(url_for("home"))
+        
+    uid, username, role, name, age, week, doctor_advice = user_row
+    week = week or 0
+    return render_template(
+        "settings.html",
+        user_id=uid,
+        username=username,
+        role=role,
+        name=name,
+        age=age,
+        week=week,
+        doctor_advice=doctor_advice,
+        imu_mode=IMU_MODE,
+        imu_port=IMU_PORT,
+        imu_baud=IMU_BAUD,
+        imu_host=IMU_HOST,
+        use_imu=USE_IMU
+    )
+
+@app.route("/settings/save", methods=["POST"])
+def settings_save():
+    if "user_id" not in session:
+        return jsonify({"success": False, "message": "Chưa đăng nhập"}), 401
+        
+    name = request.form.get("name", "").strip()
+    age = request.form.get("age", "").strip()
+    week = request.form.get("week", "").strip()
+    password = request.form.get("password", "").strip()
+    
+    conn = connect_db()
+    cursor = conn.cursor()
+    try:
+        if name:
+            cursor.execute("UPDATE users SET name = ? WHERE id = ?", (name, session["user_id"]))
+            session["name"] = name
+        if age.isdigit():
+            cursor.execute("UPDATE users SET age = ? WHERE id = ?", (int(age), session["user_id"]))
+        if week.isdigit():
+            cursor.execute("UPDATE users SET week = ? WHERE id = ?", (int(week), session["user_id"]))
+        if password:
+            if len(password) < 10:
+                conn.close()
+                return jsonify({"success": False, "message": "Mật khẩu phải từ 10 ký tự trở lên."}), 400
+            from werkzeug.security import generate_password_hash
+            cursor.execute("UPDATE users SET password = ? WHERE id = ?", (generate_password_hash(password), session["user_id"]))
+        conn.commit()
+    except Exception as e:
+        conn.close()
+        return jsonify({"success": False, "message": str(e)}), 500
+    finally:
+        conn.close()
+        
+    return jsonify({"success": True, "message": "Đã lưu cài đặt thành công!"})
+
+
+@app.route("/help")
+def help_page():
+    if "user_id" not in session:
+        return redirect(url_for("home"))
+    
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT week FROM users WHERE id = ?", (session["user_id"],))
+    row = cursor.fetchone()
+    conn.close()
+    week = row[0] if row and row[0] else 0
+    return render_template("help.html", name=session.get("name", "Bệnh nhân"), week=week)
+
+@app.route("/guide")
+def guide():
+    if "user_id" not in session:
+        return redirect(url_for("home"))
+    
+    name = session.get("name", "Bệnh nhân")
+    week = 0
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT week FROM users WHERE id = ?", (session["user_id"],))
+    row = cursor.fetchone()
+    conn.close()
+    if row and row[0]:
+        week = row[0]
+        
+    return render_template("guide.html", name=name, week=week, role=session.get("role", "patient"))
 
 @app.route("/profile")
 def profile():

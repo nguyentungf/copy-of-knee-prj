@@ -136,5 +136,104 @@
             }).catch(error => Rehab.notify(error.message));
         }
     </script>
+<!-- ====== UI OVERLAYS FOR NEW LOGIC ====== -->
+<div id="ui-overlays">
+    <!-- Notifications Dropdown -->
+    <div id="notif-dropdown" style="display:none; position:absolute; top:70px; right:34px; width:300px; background:#fff; border:1px solid #e4ebf3; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.1); z-index:100; padding:15px;">
+        <h4 style="margin:0 0 10px; font-size:14px; color:#10233e; border-bottom:1px solid #e4ebf3; padding-bottom:10px;">Thông báo của bạn</h4>
+        <div id="notif-list" style="max-height:300px; overflow-y:auto; font-size:12px; color:#6d7d92;">
+            Đang tải...
+        </div>
+    </div>
+
+    <!-- Profile Edit Modal -->
+    <div id="profile-modal" class="overlay" style="display:none; align-items:center; justify-content:center; position:fixed; inset:0; background:rgba(9,19,33,0.85); z-index:100; backdrop-filter:blur(5px);">
+        <div class="modal" style="background:#fff; border-radius:20px; padding:32px; width:92%; max-width:400px; text-align:left;">
+            <h2 style="margin:0 0 20px; font-size:20px; color:#10233e; font-weight: 800; letter-spacing: -1px;">Hồ sơ tài khoản</h2>
+            <form id="profile-form">
+                <label style="display:block; margin-bottom:15px; font-size:13px; font-weight:600; color:#52657a;">
+                    Tuần phục hồi hiện tại:
+                    <input type="number" name="week" min="0" max="100" value="{{ week }}" style="width:100%; padding:10px; margin-top:6px; border:1px solid #e4ebf3; border-radius:8px; font-family: 'DM Mono'; font-size: 14px;">
+                </label>
+                <label style="display:block; margin-bottom:20px; font-size:13px; font-weight:600; color:#52657a;">
+                    Đổi mật khẩu mới (Tùy chọn):
+                    <input type="password" name="password" placeholder="Nhập ít nhất 10 ký tự" style="width:100%; padding:10px; margin-top:6px; border:1px solid #e4ebf3; border-radius:8px; font-family: 'DM Mono'; font-size: 14px;">
+                </label>
+                <div style="display:flex; gap:10px;">
+                    <button type="button" class="btn-secondary" onclick="document.getElementById('profile-modal').style.display='none'" style="flex:1;">Hủy</button>
+                    <button type="submit" class="btn-primary" style="flex:1;">Lưu thay đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// --- UI Bindings ---
+if (document.querySelector(".dots")) {
+    document.querySelector(".dots").parentElement.style.cursor = "pointer";
+    document.querySelector(".dots").parentElement.addEventListener("click", () => {
+        document.getElementById("profile-modal").style.display = "flex";
+    });
+}
+
+if (document.getElementById("profile-form")) {
+    document.getElementById("profile-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const btn = e.target.querySelector("button[type=\"submit\"]");
+        const formData = new FormData(e.target);
+        try {
+            btn.disabled = true;
+            btn.textContent = "Đang lưu...";
+            const res = await window.Rehab.api("/api/update_profile", {
+                method: "POST",
+                body: formData
+            });
+            if (res.success) {
+                window.Rehab.notify("Cập nhật hồ sơ thành công!", "info");
+                setTimeout(() => location.reload(), 1000);
+            }
+        } catch (err) {
+            window.Rehab.notify(err.message, "error");
+            btn.disabled = false;
+            btn.textContent = "Lưu thay đổi";
+        }
+    });
+}
+
+if (document.querySelector(".bell")) {
+    document.querySelector(".bell").addEventListener("click", async (e) => {
+        e.stopPropagation();
+        const dropdown = document.getElementById("notif-dropdown");
+        dropdown.style.display = dropdown.style.display === "none" ? "block" : "none";
+        if (dropdown.style.display === "block") {
+            try {
+                const res = await window.Rehab.api("/api/notifications");
+                const list = document.getElementById("notif-list");
+                if (!res.notifications || res.notifications.length === 0) {
+                    list.innerHTML = "<p>Không có thông báo mới.</p>";
+                } else {
+                    list.innerHTML = res.notifications.map(n => 
+                        `<div style="margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid #f0f3f6;">
+                            <strong style="display:block; color:${n.type==='doctor'?'#0e6fff':'#0dba78'};">${n.title}</strong>
+                            <span style="font-size:12px; line-height:1.4;">${n.message}</span>
+                         </div>`
+                    ).join("");
+                }
+            } catch(err) {
+                document.getElementById("notif-list").innerHTML = "Lỗi tải thông báo.";
+            }
+        }
+    });
+}
+
+document.addEventListener("click", (e) => {
+    if(!e.target.closest("#notif-dropdown") && !e.target.closest(".bell")) {
+        const d = document.getElementById("notif-dropdown");
+        if(d) d.style.display = "none";
+    }
+});
+
+</script>
 </body>
 </html>
