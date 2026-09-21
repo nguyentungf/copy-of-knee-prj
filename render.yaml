@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: kneerom
+    runtime: python
+    plan: free
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.10
+      - key: ACL_ENABLE_HARDWARE
+        value: "0"
+      - key: ACL_USE_IMU
+        value: "0"
+      - key: ACL_SECRET_KEY
+        generateValue: true
+      - key: ACL_ADMIN_USERNAME
+        value: "admin"
+      - key: ACL_ADMIN_PASSWORD
+        value: "AdminKneeROM2026@"
