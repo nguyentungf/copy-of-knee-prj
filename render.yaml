@@ -19,3 +19,4 @@ services:
         value: "admin"
       - key: ACL_ADMIN_PASSWORD
         value: "AdminKneeROM2026@"
+

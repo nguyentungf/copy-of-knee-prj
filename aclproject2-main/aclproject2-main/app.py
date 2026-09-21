@@ -119,7 +119,7 @@ def security_headers(response):
 #   0  = webcam laptop
 #   1, 2 = webcam ao (vd iPhone qua Iriun/DroidCam)
 #   "http://192.168.x.x:8081/video" = stream IP tu app camera tren iPhone
-_camera_source = os.getenv("ACL_CAMERA_SOURCE", "1")
+_camera_source = os.getenv("ACL_CAMERA_SOURCE", "0")
 CAMERA_SOURCE = int(_camera_source) if _camera_source.isdecimal() else _camera_source
 USE_IMU = _env_bool("ACL_USE_IMU", True)
 IMU_MODE = os.getenv("ACL_IMU_MODE", "wifi").lower()
