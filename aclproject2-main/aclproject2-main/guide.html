@@ -17,83 +17,92 @@
         @media (max-width: 992px) {
             .guide-grid { grid-template-columns: 1fr; }
         }
-        .phase-card {
-            background: #fff;
-            border: 1px solid var(--line);
-            border-radius: 14px;
-            padding: 22px;
-            margin-bottom: 16px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .phase-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(16,35,62,0.06);
-        }
-        .phase-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-        .phase-badge {
-            font-size: 11px;
-            font-weight: 800;
-            padding: 5px 10px;
-            border-radius: 20px;
-            background: #eaf2ff;
-            color: var(--blue);
-            font-family: 'DM Mono', monospace;
-        }
-        .rom-target {
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--ink);
-            margin: 8px 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .rom-target span {
-            font-size: 13px;
-            color: var(--muted);
-            font-weight: 500;
-        }
-        .guide-list {
-            padding-left: 18px;
-            margin: 10px 0 0;
-            font-size: 13px;
-            color: #52657a;
-            line-height: 1.6;
-        }
-        .step-box {
+        .step-item {
             display: flex;
             gap: 16px;
-            margin-bottom: 20px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--line);
             align-items: flex-start;
         }
-        .step-circle {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: var(--blue);
-            color: #fff;
+        .step-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        .step-badge {
+            width: 32px;
+            height: 32px;
+            border-radius: 9999px;
+            background: #dce5ff;
+            color: var(--blue);
+            font-weight: 800;
+            font-family: 'DM Mono', monospace;
+            font-size: 13px;
             display: grid;
             place-items: center;
-            font-weight: 800;
-            font-size: 14px;
             flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(14,111,255,0.3);
         }
         .step-text h4 {
             margin: 0 0 4px;
             font-size: 15px;
+            font-weight: 700;
             color: var(--ink);
         }
         .step-text p {
             margin: 0;
             font-size: 13px;
             color: var(--muted);
-            line-height: 1.5;
+            line-height: 1.55;
+        }
+        .phase-box {
+            background: #f8fafc;
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        .phase-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .phase-badge {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            background: #dce5ff;
+            color: var(--blue);
+            letter-spacing: 0.3px;
+        }
+        .rom-display {
+            font-size: 26px;
+            font-weight: 800;
+            font-family: 'DM Mono', monospace;
+            color: var(--ink);
+            margin: 6px 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .rom-display small {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 500;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .phase-list {
+            padding-left: 18px;
+            margin: 0;
+            font-size: 12px;
+            color: #52657a;
+            line-height: 1.6;
+        }
+        .notice-card {
+            background: #f0f3ff;
+            border: 1px solid #dce5ff;
+            border-radius: 24px;
+            padding: 24px;
         }
     </style>
 </head>
@@ -107,30 +116,76 @@
                 <small class="brand-live">LIVE</small>
             </div>
             
-            <div class="clinic-pill" style="position: relative;">
+            <div class="clinic-pill">
                 <span class="avatar small">{{ name[0] if name else 'B' }}</span>
-                <div style="flex: 1;"><strong>{{ name }}</strong><small>Bệnh nhân</small></div>
-                <a href="/settings" style="text-decoration: none; color: inherit;"><span class="dots" title="Cài đặt">⚙</span></a>
+                <div style="flex: 1;">
+                    <strong>{{ name }}</strong>
+                    <small>Tuần {{ week }} · Bệnh nhân</small>
+                </div>
+                <a href="/settings" title="Cài đặt tài khoản & Thiết bị" style="text-decoration: none; color: inherit;">
+                    <span class="dots">•••</span>
+                </a>
             </div>
             
             <nav>
-                <a href="/dashboard" class="nav-item">▣ Đo biên độ</a>
-                <a href="/my_records" class="nav-item">⌂ Hồ sơ bệnh án</a>
-                <a href="/profile" class="nav-item">◒ Đồ thị phục hồi</a>
-                <a href="/game" class="nav-item">⌁ Penalty 3D</a>
-                <a href="/settings" class="nav-item">⚙ Cài đặt & Thiết bị</a>
-                <a href="/guide" class="nav-item selected">📖 Hướng dẫn tập</a>
+                <a href="/dashboard" class="nav-item">
+                    <span class="icon">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    </span>
+                    <span>Đo biên độ</span>
+                </a>
+                <a href="/my_records" class="nav-item">
+                    <span class="icon">
+                        <svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M9 12h6"/><path d="M9 16h6"/></svg>
+                    </span>
+                    <span>Hồ sơ lâm sàng</span>
+                </a>
+                <a href="/profile" class="nav-item">
+                    <span class="icon">
+                        <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                    </span>
+                    <span>Biểu đồ phục hồi</span>
+                </a>
+                <a href="/game" class="nav-item">
+                    <span class="icon">
+                        <svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4"/><path d="M8 10v4"/><circle cx="17" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="13" r="1" fill="currentColor"/></svg>
+                    </span>
+                    <span>Penalty 3D</span>
+                </a>
+                <a href="/settings" class="nav-item">
+                    <span class="icon">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    </span>
+                    <span>Thiết bị & cài đặt</span>
+                </a>
+                <a href="/guide" class="nav-item selected">
+                    <span class="icon">
+                        <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                    </span>
+                    <span>Hướng dẫn tập</span>
+                </a>
             </nav>
             
             <div class="sidebar-bottom">
-                <a href="/help" class="nav-item"><span class="icon">?</span>Trợ giúp</a>
-                <a href="/logout" class="nav-item danger">↪ Đăng xuất</a>
+                <a href="/help" class="nav-item">
+                    <span class="icon">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    </span>
+                    <span>Trợ giúp</span>
+                </a>
+                <a href="/logout" class="nav-item danger">
+                    <span class="icon">
+                        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    </span>
+                    <span>Đăng xuất</span>
+                </a>
             </div>
         </aside>
 
-        <!-- ===== MAIN CONTENT ===== -->
+        <!-- ===== MAIN VIEW ===== -->
         <main>
             <header class="topbar">
+                <button class="menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
                 <div class="crumb">
                     <span>Phục hồi của tôi</span>
                     <b>/</b>
@@ -139,7 +194,9 @@
                 <div class="top-status">
                     <span class="week-chip">TUẦN {{ week }}</span>
                     <span class="connection camera"><i></i>Camera · 30 FPS</span>
-                    <a href="/settings" class="btn-secondary" style="padding: 6px 12px; font-size: 12px; text-decoration: none;">⚙ Cài đặt</a>
+                    <a href="/dashboard" class="btn-primary" style="padding: 8px 18px; font-size: 12px;">
+                        Vào bài tập ngay
+                    </a>
                 </div>
             </header>
 
@@ -153,37 +210,37 @@
                 </div>
 
                 <div class="guide-grid">
-                    <!-- CỘT 1: THIẾT LẬP THIẾT BỊ ĐÚNG CÁCH -->
-                    <div>
-                        <div class="card" style="padding: 26px; margin-bottom: 24px;">
-                            <h2 style="font-size: 18px; margin: 0 0 18px;">📐 Quy trình thiết lập đo góc chuẩn</h2>
+                    <!-- CỘT 1: THIẾT LẬP ĐO GÓC CHUẨN -->
+                    <div style="display: flex; flex-direction: column; gap: 24px;">
+                        <div class="card" style="padding: 28px;">
+                            <h2 style="font-size: 18px; margin: 0 0 18px; color: var(--ink);">Quy trình thiết lập đo góc chuẩn</h2>
 
-                            <div class="step-box">
-                                <div class="step-circle">1</div>
+                            <div class="step-item">
+                                <div class="step-badge">01</div>
                                 <div class="step-text">
                                     <h4>Đặt góc Camera ngang tầm gối</h4>
                                     <p>Đặt Webcam hoặc Camera laptop cách vị trí ngồi 1.5m - 2m. Đảm bảo toàn bộ từ hông xuống bàn chân nằm trọn trong khung hình.</p>
                                 </div>
                             </div>
 
-                            <div class="step-box">
-                                <div class="step-circle">2</div>
+                            <div class="step-item">
+                                <div class="step-badge">02</div>
                                 <div class="step-text">
                                     <h4>Đeo cảm biến IMU chắc chắn</h4>
                                     <p>Cảm biến đo góc đùi gắn ở mặt ngoài đùi (cách khớp gối 10cm). Cảm biến cẳng chân gắn dọc xương chày. Tránh để cảm biến lỏng lẻo.</p>
                                 </div>
                             </div>
 
-                            <div class="step-box">
-                                <div class="step-circle">3</div>
+                            <div class="step-item">
+                                <div class="step-badge">03</div>
                                 <div class="step-text">
                                     <h4>Hiệu chuẩn Zero (Góc 0°)</h4>
                                     <p>Duỗi thẳng chân hoàn toàn song song với mặt phẳng, bấm phím <b>C</b> hoặc nhấn nút "Zero 0°" trên màn hình trước khi bắt đầu bài gập.</p>
                                 </div>
                             </div>
 
-                            <div class="step-box">
-                                <div class="step-circle">4</div>
+                            <div class="step-item">
+                                <div class="step-badge">04</div>
                                 <div class="step-text">
                                     <h4>Gập chân từ từ và giữ 3 giây</h4>
                                     <p>Gập gối chậm rãi đến giới hạn chịu đựng (không để quá đau nhói). Giữ yên 3 giây để thuật toán Auto-Hold tự động ghi nhận dữ liệu.</p>
@@ -191,9 +248,9 @@
                             </div>
                         </div>
 
-                        <div class="card" style="padding: 26px; background: linear-gradient(145deg, #0e6fff, #0a52be); color: white;">
-                            <h3 style="margin: 0 0 8px; font-size: 16px;">💡 Lưu ý quan trọng cho bệnh nhân ACL</h3>
-                            <p style="margin: 0; font-size: 13px; line-height: 1.6; opacity: 0.95;">
+                        <div class="notice-card">
+                            <h3 style="margin: 0 0 8px; font-size: 16px; color: var(--blue);">Lưu ý quan trọng cho bệnh nhân ACL</h3>
+                            <p style="margin: 0; font-size: 13px; line-height: 1.6; color: #52657a;">
                                 Tuyệt đối không cố ép gập gối vượt quá chỉ định của bác sĩ trong 2 tuần đầu sau phẫu thuật. Sau mỗi buổi tập, hãy chườm lạnh từ 15-20 phút để giảm phù nề và kiểm soát cơn đau.
                             </p>
                         </div>
@@ -201,19 +258,19 @@
 
                     <!-- CỘT 2: TIÊU CHUẨN ROM THEO TỪNG GIAI ĐOẠN -->
                     <div>
-                        <div class="card" style="padding: 26px;">
-                            <h2 style="font-size: 18px; margin: 0 0 16px;">🎯 Lộ trình Mục tiêu Biên độ (ROM)</h2>
+                        <div class="card" style="padding: 28px;">
+                            <h2 style="font-size: 18px; margin: 0 0 18px; color: var(--ink);">Lộ trình Mục tiêu Biên độ (ROM)</h2>
 
                             <!-- GIAI ĐOẠN 1 -->
-                            <div class="phase-card" style="border-left: 4px solid var(--blue);">
-                                <div class="phase-header">
-                                    <strong style="color: var(--blue);">Giai đoạn 1 (Tuần 1 – Tuần 2)</strong>
+                            <div class="phase-box">
+                                <div class="phase-top">
+                                    <strong style="color: var(--blue); font-size: 14px;">Giai đoạn 1 (Tuần 1 – Tuần 2)</strong>
                                     <span class="phase-badge">BẢO VỆ MẢNH GHÉP</span>
                                 </div>
-                                <div class="rom-target">
-                                    0° – 90° <span>Mục tiêu gập</span>
+                                <div class="rom-display">
+                                    0° – 90° <small>Mục tiêu gập an toàn</small>
                                 </div>
-                                <ul class="guide-list">
+                                <ul class="phase-list">
                                     <li>Kiểm soát phù nề và bảo vệ mảnh ghép dây chằng mới tái tạo.</li>
                                     <li>Kích hoạt cơ tứ đầu đùi bằng bài tập gồng cơ tĩnh (Isometric).</li>
                                     <li><b>Cấm kỵ:</b> Không ép gập quá 90° để tránh kéo dãn mảnh ghép.</li>
@@ -221,15 +278,15 @@
                             </div>
 
                             <!-- GIAI ĐOẠN 2 -->
-                            <div class="phase-card" style="border-left: 4px solid var(--green);">
-                                <div class="phase-header">
-                                    <strong style="color: var(--green);">Giai đoạn 2 (Tuần 3 – Tuần 6)</strong>
-                                    <span class="phase-badge" style="background:#eaf7f2; color:#0dba78;">TĂNG ROM & LỰC CƠ</span>
+                            <div class="phase-box">
+                                <div class="phase-top">
+                                    <strong style="color: var(--green); font-size: 14px;">Giai đoạn 2 (Tuần 3 – Tuần 6)</strong>
+                                    <span class="phase-badge" style="background:#eaf7f2; color:#0ba360;">TĂNG ROM & LỰC CƠ</span>
                                 </div>
-                                <div class="rom-target">
-                                    90° – 125° <span>Mục tiêu gập</span>
+                                <div class="rom-display">
+                                    90° – 125° <small>Mục tiêu mở rộng biên độ</small>
                                 </div>
-                                <ul class="guide-list">
+                                <ul class="phase-list">
                                     <li>Bắt đầu đạp xe đạp lực cản nhẹ tại chỗ.</li>
                                     <li>Tập bài tập Squat nông (dưới 45°), bài tập bước cầu thang thấp.</li>
                                     <li>Phục hồi dáng đi bình thường không cần nạng hỗ trợ.</li>
@@ -237,18 +294,18 @@
                             </div>
 
                             <!-- GIAI ĐOẠN 3 -->
-                            <div class="phase-card" style="border-left: 4px solid var(--cyan);">
-                                <div class="phase-header">
-                                    <strong style="color: #08b7bf;">Giai đoạn 3 (Tuần 7 – Tuần 12+)</strong>
+                            <div class="phase-box" style="margin-bottom: 0;">
+                                <div class="phase-top">
+                                    <strong style="color: #08b7bf; font-size: 14px;">Giai đoạn 3 (Tuần 7 – Tuần 12+)</strong>
                                     <span class="phase-badge" style="background:#e0f9fb; color:#08b7bf;">PHỤC HỒI TOÀN DIỆN</span>
                                 </div>
-                                <div class="rom-target">
-                                    125° – 135°+ <span>Hoàn nguyên biên độ</span>
+                                <div class="rom-display">
+                                    125° – 135°+ <small>Hoàn nguyên biên độ gốc</small>
                                 </div>
-                                <ul class="guide-list">
+                                <ul class="phase-list">
                                     <li>Lấy lại hoàn toàn biên độ khớp gối đối bên lành.</li>
                                     <li>Tập thăng bằng nâng cao (Single leg balance, Bosu ball).</li>
-                                    <li>Chạy bộ nhẹ nhàng trên máy chạy bộ (Treadmill) theo đánh giá bác sĩ.</li>
+                                    <li>Chạy bộ nhẹ nhàng trên máy chạy bộ theo chỉ định bác sĩ.</li>
                                 </ul>
                             </div>
                         </div>
@@ -259,4 +316,3 @@
     </div>
 </body>
 </html>
-
