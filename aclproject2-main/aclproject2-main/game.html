@@ -65,6 +65,17 @@
   .modal h2 { margin: 0 0 8px; color: var(--ink); font-size: 24px; font-weight: 800; letter-spacing: -1px; }
   .kv { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 14px; color: #52657a; font-weight: 600; }
   .kv b { color: var(--ink); font-family: 'DM Mono'; font-size: 16px; }
+  @media (max-width: 720px) {
+    #view { height: 360px; }
+    .game-top { padding: 14px 16px; border-radius: 16px; }
+    .game-top h1 { font-size: 17px; }
+    .game-panel { padding: 16px; border-radius: 16px; }
+    .controls { flex-direction: column; gap: 8px; }
+    .rowbtn { flex-direction: column; gap: 8px; }
+    .goalbox { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .goalbox input { width: 60px; }
+    .ginfo { margin-left: 0; }
+  }
 </style>
 </head>
 <body>
@@ -136,6 +147,7 @@
         <!-- ===== MAIN CONTENT ===== -->
         <main>
             <header class="topbar">
+                <button class="menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
                 <div class="crumb"><span>Phục hồi của tôi</span><b>/</b><strong>Penalty 3D</strong></div>
                 <div class="top-status">
                     <span class="week-chip">TUẦN {{ week }}</span>

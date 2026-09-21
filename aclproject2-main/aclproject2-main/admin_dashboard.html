@@ -36,6 +36,7 @@
         <!-- ===== BÊN PHẢI: NỘI DUNG CHÍNH ===== -->
         <main>
             <header class="topbar">
+                <button class="menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
                 <div class="crumb"><span>Cổng quản lý Bác sĩ</span><b>/</b><strong>Tổng quan</strong></div>
                 <div class="top-status">
                     <span class="connection live"><i></i>Hệ thống ổn định</span>
@@ -53,6 +54,7 @@
                 </div>
 
                 <div class="workspace" style="grid-template-columns: 1fr 1fr; gap: 24px;">
+                <div class="grid-2col">
                     <!-- Thống kê tổng quan -->
                     <div class="goal" style="background: #fff; padding: 24px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px;">
                         <span style="font-size: 13px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;">TỔNG BỆNH NHÂN</span>
@@ -68,6 +70,7 @@
                 </div>
 
                 <div class="workspace" style="margin-top: 24px; grid-template-columns: 1.5fr 1fr;">
+                <div class="grid-asym" style="margin-top: 24px;">
                     <div class="logs" style="margin-top: 0;">
                         <div class="logs-head">
                             <div>

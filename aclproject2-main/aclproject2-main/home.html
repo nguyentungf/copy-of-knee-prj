@@ -84,9 +84,13 @@
         .alert-danger::before { background: #ef4444; }
 
         @media (max-width: 860px) { 
-            .auth-card { grid-template-columns: 1fr; } 
+            .auth-card { grid-template-columns: 1fr; border-radius: 20px; } 
             .brand-side { display: none; } 
-            .panel-side { padding: 30px; }
+            .panel-side { padding: 24px 20px; }
+        }
+        @media (max-width: 480px) {
+            body { padding: 12px; }
+            .panel-side { padding: 20px 16px; }
         }
     </style>
 </head>
