@@ -3,89 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BME Rehab - Chi tiết hồ sơ bệnh nhân</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root { --primary:#0E82FD; --teal:#14C0C6; --green:#16A34A; --amber:#D97706; --ink:#1B2559; --muted:#6B7A99; --line:#E6ECF5; --bg:#F3F7FF; }
-        * { box-sizing: border-box; }
-        body { font-family: 'Poppins','Segoe UI',Arial,sans-serif; background: var(--bg); margin: 0; padding: 40px; color: var(--ink); }
-        .container { max-width: 820px; margin: auto; background: white; padding: 32px; border-radius: 20px; border: 1px solid var(--line); box-shadow: 0 16px 36px rgba(14,130,253,.07); }
-        .meta-info { background: #F1F5FC; padding: 22px; border-radius: 14px; margin-bottom: 25px; display: flex; gap: 40px; flex-wrap: wrap; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
-        th { background: linear-gradient(135deg,#0E82FD,#14C0C6); color: white; padding: 13px; text-align: left; font-weight: 600; }
-        th:first-child { border-radius: 10px 0 0 0; } th:last-child { border-radius: 0 10px 0 0; }
-        td { padding: 13px; border-bottom: 1px solid var(--line); }
-        tr:hover td { background: #FBFCFF; }
-        .btn-back { display: inline-block; background: #fff; color: var(--ink); padding: 11px 20px; border-radius: 12px; text-decoration: none; font-weight: 600; margin-bottom: 20px; border: 1px solid var(--line); box-shadow: 0 6px 16px rgba(14,130,253,.06); }
-        h2, h3 { font-weight: 700; }
-        .advice-box { background: #FFFBEB; border: 1px solid #FDE9C8; padding: 22px; border-radius: 16px; margin-bottom: 25px; border-left: 5px solid var(--amber); }
-        .advice-textarea { width: 100%; height: 84px; padding: 12px; border-radius: 10px; border: 1.5px solid var(--line); font-family: inherit; font-size: 14px; box-sizing: border-box; resize: vertical; }
-        .advice-textarea:focus { outline: none; border-color: var(--amber); }
-        .btn-submit-advice { background: var(--amber); color: white; border: none; padding: 11px 20px; border-radius: 10px; font-weight: 600; cursor: pointer; margin-top: 12px; transition: .2s; font-family: inherit; }
-        .btn-submit-advice:hover { background: #B45309; }
-    </style>
+    <title>BME Rehab - Chi tiết bệnh án</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='rehab.css') }}">
     <script src="{{ url_for('static', filename='rehab.js') }}"></script>
 </head>
 <body>
-    <noscript><p class="empty-state">Vui lòng bật JavaScript để dùng dữ liệu trực tiếp và các nút điều khiển.</p></noscript>
-    <div style="max-width: 820px; margin: auto;">
-        <a href="/admin" class="btn-back">⬅ Quay lại danh sách tổng</a>
-        <div class="container">
-            <h2 style="color:var(--primary); margin-top:0;">📋 Chi tiết bệnh án phục hồi chức năng</h2>
-
-            <div class="meta-info">
-                <p>Bệnh nhân: <b style="color:var(--primary); font-size:18px;">{{ user[1] }}</b></p>
-                <p>Tuổi: <b>{{ user[2] }} tuổi</b></p>
-                <p>Tiến trình phẫu thuật: <b>Tuần {{ user[3] }}</b></p>
+    <div class="app-shell">
+        <!-- ===== SIDEBAR ĐIỀU HƯỚNG ===== -->
+        <aside class="sidebar admin-sidebar">
+            <div class="brand">
+                <div class="brand-mark"><span></span><span></span><span></span></div>
+                <span>Knee<span>ROM</span></span>
             </div>
-
-            <div class="advice-box">
-                <h3 style="margin-top:0; color:#B45309; font-size:16px;">✍️ Chỉ định điều trị & Lời khuyên chuyên môn của Bác sĩ</h3>
-                <form action="/admin/save_advice/{{ user[0] }}" method="POST">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <label class="sr-only" for="doctor-advice">Lời khuyên dành cho bệnh nhân</label>
-                    <textarea id="doctor-advice" name="doctor_advice" class="advice-textarea" maxlength="5000" placeholder="Nhập lời khuyên, bài tập bổ sung hoặc dặn dò riêng dành cho bệnh nhân này tại đây...">{{ user[5] if user[5] else '' }}</textarea>
-                    <button type="submit" class="btn-submit-advice">💾 Lưu và gửi lời khuyên tới bệnh nhân</button>
-                </form>
+            
+            <div class="clinic-pill">
+                <span class="avatar small" style="background: linear-gradient(145deg, #16a34a, #0dba78);">BS</span>
+                <div><strong>Cổng Bác sĩ</strong><small>Khoa Phục hồi</small></div>
             </div>
+            
+            <nav>
+                <a href="/admin_dashboard" class="nav-item selected">▣ Tổng quan số liệu</a>
+                <a href="/export_all" class="nav-item">◒ Xuất dữ liệu Excel</a>
+            </nav>
+            
+            <div class="sidebar-bottom">
+                <a href="/logout" class="nav-item danger">↪ Đăng xuất</a>
+            </div>
+        </aside>
 
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-                <h3 style="color:var(--ink); margin:0;">🕒 Toàn bộ nhật ký lịch sử đo góc gập gối</h3>
-                <div style="display:flex; gap:8px;">
-                    <a href="/export_compare/{{ user[0] }}" style="background:var(--primary); color:#fff; padding:10px 16px; border-radius:10px; text-decoration:none; font-weight:600; font-size:13px;">⬇ Xuất Excel (có biểu đồ)</a>
-                    <button onclick="deleteAllPatient({{ user[0] }})" style="background:#FDECEC; color:#E0413A; border:none; padding:10px 16px; border-radius:10px; cursor:pointer; font-weight:600; font-size:13px; font-family:inherit;">🗑️ Xóa tất cả</button>
+        <!-- ===== NỘI DUNG CHÍNH ===== -->
+        <main>
+            <header class="topbar">
+                <div class="crumb"><span>Cổng quản lý Bác sĩ</span><b>/</b><a href="/admin_dashboard" style="text-decoration:none; color:#8794a5;">Tổng quan</a><b>/</b><strong>Hồ sơ {{ user[1] }}</strong></div>
+                <div class="top-status">
+                    <span class="connection live"><i></i>Hệ thống ổn định</span>
+                    <button class="bell">🔔<em></em></button>
                 </div>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Lượt đo</th>
-                        <th>Biên độ góc ROM đạt được</th>
-                        <th>Nguồn đo</th>
-                        <th>Thời điểm ghi nhận hệ thống</th>
-                        <th>Xóa</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in history %}
-                    <tr>
-                        <td>Lượt #{{ loop.index }}</td>
-                        <td style="color:var(--green); font-weight:700; font-size:16px;">{{ row[0] }}°</td>
-                        <td style="color:var(--muted);">{{ '🦵 Cảm biến IMU' if row[2] == 'imu' else '📷 Camera' }}</td>
-                        <td style="color:var(--muted);">{{ row[1] }}</td>
-                        <td><button onclick="deleteMeasurement({{ row[3] }}, this)" style="background:none; border:none; cursor:pointer; font-size:16px;" title="Xóa lượt đo này">🗑️</button></td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="5" style="text-align:center; color:var(--muted); padding:30px;">Bệnh nhân này chưa thực hiện lượt đo đạc nào.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+            </header>
+
+            <section class="content">
+                <div class="title-row" style="align-items: center;">
+                    <div>
+                        <p class="eyebrow">CHI TIẾT BỆNH ÁN PHỤC HỒI</p>
+                        <h1>Hồ sơ: {{ user[1] }}</h1>
+                        <p class="subtitle">Mã hồ sơ #{{ user[0] }} • Tuổi: {{ user[2] }} • Giai đoạn: Tuần {{ user[3] }}</p>
+                    </div>
+                    <div>
+                        <a href="/export_compare/{{ user[0] }}" class="btn-primary" style="text-decoration: none;">⬇ Xuất Excel bệnh nhân này</a>
+                    </div>
+                </div>
+
+                <div class="workspace" style="grid-template-columns: 1fr;">
+                    
+                    <div class="card" style="margin-bottom: 24px; padding: 24px; background: #fffcf0; border-color: #f7e7b8;">
+                        <h3 style="margin: 0 0 16px; font-size: 15px; color: #a17013; display: flex; align-items: center; gap: 8px;">
+                            <span style="background: #e8bd3b; color: #fff; width: 24px; height: 24px; display: inline-grid; place-items: center; border-radius: 6px; font-size: 12px;">✍️</span> 
+                            Chỉ định điều trị & Lời khuyên
+                        </h3>
+                        <form action="/admin/save_advice/{{ user[0] }}" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <label class="sr-only" for="doctor-advice">Lời khuyên dành cho bệnh nhân</label>
+                            <textarea id="doctor-advice" name="doctor_advice" style="width: 100%; height: 90px; padding: 14px; border-radius: 12px; border: 1.5px solid #f7e7b8; font-family: inherit; font-size: 14px; resize: vertical; margin-bottom: 12px; background: #fff;" maxlength="5000" placeholder="Nhập lời khuyên, bài tập bổ sung hoặc dặn dò riêng dành cho bệnh nhân này tại đây...">{{ user[5] if user[5] else '' }}</textarea>
+                            <button type="submit" class="btn-primary" style="background: #e8bd3b; color: #fff; box-shadow: none;">💾 Lưu và gửi lời khuyên</button>
+                        </form>
+                    </div>
+
+                    <div class="logs" style="margin-top: 0;">
+                        <div class="logs-head" style="align-items: flex-end;">
+                            <div>
+                                <h2>🕒 Nhật ký đo góc gập gối (ROM)</h2>
+                                <p>Toàn bộ lịch sử các lượt đo đạc</p>
+                            </div>
+                            <button onclick="deleteAllPatient({{ user[0] }})" class="btn-secondary" style="color: #ef4444; border-color: #fca5a5; padding: 10px 14px; font-size: 13px;">🗑️ Xóa tất cả dữ liệu đo</button>
+                        </div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Lượt đo</th>
+                                        <th>Biên độ góc ROM</th>
+                                        <th>Nguồn đo</th>
+                                        <th>Thời điểm hệ thống</th>
+                                        <th style="width: 60px;">Xóa</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in history %}
+                                    <tr>
+                                        <td style="font-family: 'DM Mono'; font-weight: 500; font-size: 12px;">#{{ loop.index }}</td>
+                                        <td style="color:var(--green); font-weight:800; font-size:16px;">{{ row[0] }}°</td>
+                                        <td>
+                                            <span class="logged" style="background: {{ '#eaf2ff; color: var(--blue)' if row[2] == 'camera' else '#e8f8f0; color: #0c9c6a' }}">
+                                                {{ '🦵 Cảm biến IMU' if row[2] == 'imu' else '📷 Camera 3D' }}
+                                            </span>
+                                        </td>
+                                        <td style="font-family: 'DM Mono'; font-size: 12px; color: var(--muted);">{{ row[1] }}</td>
+                                        <td>
+                                            <button onclick="deleteMeasurement({{ row[3] }}, this)" style="border: none; background: transparent; cursor: pointer; opacity: 0.6; transition: 0.2s; font-size: 16px;" title="Xóa lượt đo này" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">🗑️</button>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="5" class="empty-state" style="padding: 40px;">Bệnh nhân này chưa thực hiện lượt đo đạc nào.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </main>
     </div>
+
     <script>
         function deleteMeasurement(mid, btn) {
             if (!confirm('Xóa lượt đo này khỏi hồ sơ bệnh nhân?')) return;

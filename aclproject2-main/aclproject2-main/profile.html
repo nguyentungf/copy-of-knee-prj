@@ -3,41 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BME Rehab - Biểu đồ tiến trình phục hồi</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root { --primary:#0E82FD; --teal:#14C0C6; --amber:#F59E0B; --ink:#1B2559; --muted:#6B7A99; --line:#E6ECF5; --bg:#F3F7FF; }
-        * { box-sizing: border-box; }
-        body { font-family: 'Poppins','Segoe UI',Arial,sans-serif; background: var(--bg); color: var(--ink); margin: 0; padding: 40px; }
-        .container { max-width: 920px; margin: auto; display: flex; flex-direction: column; gap: 24px; }
-        .header-card { background: linear-gradient(135deg,#0E82FD,#14C0C6); color:#fff; padding: 28px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 16px 36px rgba(14,130,253,.2); }
-        .chart-box { background: #fff; padding: 26px; border-radius: 20px; border: 1px solid var(--line); height: 400px; box-shadow: 0 16px 36px rgba(14,130,253,.07); }
-        .btn-back { background: rgba(255,255,255,.18); color: white; padding: 11px 20px; border-radius: 12px; text-decoration: none; font-weight: 600; }
-        h1, h3 { font-weight: 700; }
-    </style>
+    <title>BME Rehab - Biểu đồ tiến trình</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='rehab.css') }}">
     <script src="{{ url_for('static', filename='rehab.js') }}"></script>
 </head>
 <body>
-    <noscript><p class="empty-state">Vui lòng bật JavaScript để dùng dữ liệu trực tiếp và các nút điều khiển.</p></noscript>
-    <div class="container">
-        <div class="header-card">
-            <div>
-                <h1 style="margin:0; font-size:24px;">📈 Biểu đồ tiến trình gập gối cá nhân</h1>
-                <p style="margin:6px 0 0 0; color:rgba(255,255,255,.88);">Bệnh nhân: <b>{{ user[1] }}</b> | Giai đoạn: <b>Tuần {{ user[3] }}</b></p>
+    <div class="app-shell">
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark"><span></span><span></span><span></span></div>
+                <span>Knee<span>ROM</span></span>
             </div>
-            <a href="/dashboard" class="btn-back">⬅ Quay lại phòng tập</a>
-        </div>
+            
+            <div class="clinic-pill">
+                <span class="avatar small">{{ user[1][0] if user[1] else 'B' }}</span>
+                <div><strong>{{ user[1] }}</strong><small>Bệnh nhân</small></div>
+            </div>
+            
+            <nav>
+                <a href="/dashboard" class="nav-item">▣ Đo biên độ</a>
+                <a href="/my_records" class="nav-item">⌂ Hồ sơ bệnh án</a>
+                <a href="/profile" class="nav-item selected">◒ Đồ thị phục hồi</a>
+                <a href="/game" class="nav-item">⌁ Penalty 3D</a>
+            </nav>
+            
+            <div class="sidebar-bottom">
+                <a href="/logout" class="nav-item danger">↪ Đăng xuất</a>
+            </div>
+        </aside>
 
-        <div class="chart-box">
-            <h3 style="margin:0 0 15px 0; color:var(--primary);">So sánh ROM lớn nhất theo ngày — Camera vs Cảm biến (độ °)</h3>
-            <div style="position: relative; height: 300px;">
-                <canvas id="kneeChart"></canvas>
-            </div>
-        </div>
+        <!-- ===== MAIN CONTENT ===== -->
+        <main>
+            <header class="topbar">
+                <div class="crumb"><span>Phục hồi của tôi</span><b>/</b><strong>Đồ thị phục hồi</strong></div>
+                <div class="top-status">
+                    <span class="week-chip">TUẦN {{ user[3] }}</span>
+                    <button class="bell">🔔<em></em></button>
+                </div>
+            </header>
+
+            <section class="content">
+                <div class="title-row">
+                    <div>
+                        <p class="eyebrow">THEO DÕI QUÁ TRÌNH</p>
+                        <h1>Đồ thị phục hồi</h1>
+                        <p class="subtitle">So sánh góc gập gối tối đa thu thập từ Camera 3D và Cảm biến IMU qua từng ngày.</p>
+                    </div>
+                </div>
+
+                <div class="workspace" style="grid-template-columns: 1fr;">
+                    <div class="card" style="padding: 24px; min-height: 500px; display: flex; flex-direction: column;">
+                        <h3 style="margin: 0 0 20px 0; font-size: 14px; color: #52657a;">So sánh ROM lớn nhất theo ngày (độ °)</h3>
+                        <div style="flex: 1; position: relative; min-height: 380px;">
+                            <canvas id="kneeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
+
     <script>
         const ctx = document.getElementById('kneeChart').getContext('2d');
         new Chart(ctx, {
@@ -48,26 +77,36 @@
                     {
                         label: '📷 Camera (°)',
                         data: {{ cam_angles | safe }},
-                        borderColor: '#0E82FD',
-                        backgroundColor: 'rgba(14, 130, 253, 0.08)',
-                        borderWidth: 3, pointBackgroundColor: '#0E82FD', pointRadius: 5, tension: 0.15, fill: false, spanGaps: true
+                        borderColor: '#0e6fff',
+                        backgroundColor: 'rgba(14, 111, 255, 0.08)',
+                        borderWidth: 3, pointBackgroundColor: '#0e6fff', pointRadius: 5, tension: 0.25, fill: true, spanGaps: true
                     },
                     {
                         label: '🦵 Cảm biến (°)',
                         data: {{ imu_angles | safe }},
-                        borderColor: '#16A34A',
-                        backgroundColor: 'rgba(22, 163, 74, 0.08)',
-                        borderWidth: 3, pointBackgroundColor: '#16A34A', pointRadius: 5, tension: 0.15, fill: false, spanGaps: true
+                        borderColor: '#0dba78',
+                        backgroundColor: 'rgba(13, 186, 120, 0.08)',
+                        borderWidth: 3, pointBackgroundColor: '#0dba78', pointRadius: 5, tension: 0.25, fill: true, spanGaps: true
                     }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { labels: { color: '#1B2559' } } },
+                plugins: { 
+                    legend: { labels: { color: '#10233e', font: { family: 'Plus Jakarta Sans', weight: '600' } } } 
+                },
                 scales: {
-                    y: { beginAtZero: true, max: 180, grid: { color: '#E6ECF5' }, ticks: { color: '#6B7A99', stepSize: 30 } },
-                    x: { grid: { color: '#E6ECF5' }, ticks: { color: '#6B7A99' } }
+                    y: { 
+                        beginAtZero: true, 
+                        max: 180, 
+                        grid: { color: '#e4ebf3' }, 
+                        ticks: { color: '#6d7d92', stepSize: 30, font: { family: 'DM Mono' } } 
+                    },
+                    x: { 
+                        grid: { color: '#e4ebf3', display: false }, 
+                        ticks: { color: '#6d7d92', font: { family: 'Plus Jakarta Sans', weight: '500' } } 
+                    }
                 }
             }
         });

@@ -3,220 +3,278 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BME Rehab - Phòng tập phục hồi chức năng</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #0E82FD; --primary-dark: #0A6AD4; --teal: #14C0C6;
-            --green: #16A34A; --amber: #F59E0B; --ink: #1B2559; --muted: #6B7A99;
-            --line: #E6ECF5; --bg: #F3F7FF; --soft: #F1F5FC;
-        }
-        * { box-sizing: border-box; }
-        body { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--ink); margin: 0; padding: 25px; }
-        .topbar { max-width: 1300px; margin: 0 auto 22px; display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; color: var(--ink); }
-        .topbar span { background: linear-gradient(150deg,#0E82FD,#14C0C6); color:#fff; width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center; }
-        .grid-layout { display: grid; grid-template-columns: 1.6fr 1fr; gap: 24px; max-width: 1300px; margin: auto; }
-        .card { background: #fff; padding: 26px; border-radius: 18px; border: 1px solid var(--line); box-shadow: 0 12px 30px rgba(14,130,253,0.06); }
-        h2, h3 { font-weight: 700; }
-        .video-box { width: 100%; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: #000; }
-        .btn { display: inline-block; width: 100%; padding: 14px; border: none; border-radius: 12px; font-weight: 600; text-align: center; text-decoration: none; cursor: pointer; font-size: 15px; margin-top: 12px; box-sizing: border-box; font-family: inherit; transition: .2s; }
-        .btn:hover { transform: translateY(-1px); }
-        .btn-success { background: var(--green); color: white; box-shadow: 0 8px 18px rgba(22,163,74,.22); }
-        .btn-profile { background: var(--primary); color: #fff; box-shadow: 0 8px 18px rgba(14,130,253,.22); }
-        .btn-logout { background: #FDECEC; color: #E0413A; }
-        .rom-text { font-size: 64px; text-align: center; font-weight: 800; margin: 10px 0; }
-        ul { padding-left: 18px; color: var(--muted); }
-        li { margin-bottom: 8px; }
-        p { line-height: 1.6; }
-
-        .stepper { display: flex; gap: 10px; margin-bottom: 22px; }
-        .step { flex: 1; text-align: center; padding: 12px; border-radius: 12px; background: var(--soft); color: var(--muted); font-weight: 600; font-size: 14px; border: 1px solid var(--line); transition: .2s; }
-        .step.active { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 8px 16px rgba(14,130,253,.28); }
-        .step.done { background: #E3F9EC; color: var(--green); border-color: #BBF0CF; }
-
-        .cal-buttons { display: flex; gap: 8px; margin-top: 10px; }
-        .cal-buttons button { flex: 1; padding: 12px; border: none; border-radius: 11px; font-weight: 600; cursor: pointer; color: #fff; font-family: inherit; }
-        .live-row { display: flex; justify-content: space-around; font-size: 18px; margin: 16px 0; }
-        .compare-box { display: flex; gap: 15px; margin: 20px 0; }
-        .compare-item { flex: 1; text-align: center; background: var(--soft); padding: 22px; border-radius: 14px; border: 1px solid var(--line); }
-        .compare-item .big { font-size: 40px; font-weight: 800; margin: 8px 0; }
-        .status-badge { font-size: 13px; padding: 4px 11px; border-radius: 20px; background: #7f1d1d; color: #fff; font-weight: 600; }
-        .legbtn { padding: 9px 16px; border: 1.5px solid var(--line); border-radius: 10px; background: #fff; color: var(--muted); cursor: pointer; font-weight: 600; font-family: inherit; }
-        .legbtn-active { background: var(--primary); color: #fff; border-color: var(--primary); }
-        .legbtn:disabled { opacity: 0.4; cursor: not-allowed; background: #F1F5FC; color: var(--muted); }
-
-        .table-section { margin-top: 22px; background: #fff; padding: 20px; border-radius: 18px; border: 1px solid var(--line); box-shadow: 0 12px 30px rgba(14,130,253,0.06); }
-        .table-title { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 14px; }
-        .table-scroll { max-height: 220px; overflow-y: auto; border: 1px solid var(--line); border-radius: 12px; }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
-        th { background: #F6F9FF; color: var(--primary); padding: 11px; font-weight: 600; border-bottom: 1px solid var(--line); position: sticky; top: 0; }
-        td { padding: 11px; border-bottom: 1px solid var(--line); color: var(--ink); }
-        tr:nth-child(even) { background: #FBFCFF; }
-        .pill { background:#EAF3FF; padding:4px 10px; border-radius:20px; color:var(--primary); font-weight:700; }
-        @media (max-width: 980px) { .grid-layout { grid-template-columns: 1fr; } }
-    </style>
+    <title>BME Rehab - Đo biên độ khớp gối (Figma UI)</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="{{ url_for('static', filename='rehab.css') }}">
     <script src="{{ url_for('static', filename='rehab.js') }}"></script>
 </head>
 <body>
-    <noscript><p class="empty-state">Vui lòng bật JavaScript để dùng dữ liệu trực tiếp và các nút điều khiển.</p></noscript>
-    <div class="topbar"><span>🦴</span> BME Rehab · Phục hồi khớp gối</div>
-    <div class="grid-layout">
-        <div>
-            <div class="card">
-                <h2 style="margin-top:0; color:var(--primary);">🦵 Quy trình đo góc gập gối</h2>
+    <div class="app-shell">
+        <!-- ===== BÊN TRÁI: SIDEBAR ĐIỀU HƯỚNG ===== -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark"><span></span><span></span><span></span></div>
+                <span>Knee<span>ROM</span></span>
+            </div>
+            
+            <div class="clinic-pill">
+                <span class="avatar small">{{ name[0] if name else 'B' }}</span>
+                <div><strong>{{ name }}</strong><small>Bệnh nhân</small></div>
+                <span class="dots">•••</span>
+            </div>
+            
+            <nav>
+                <a href="/dashboard" class="nav-item selected">▣ Đo biên độ</a>
+                <a href="/my_records" class="nav-item">⌂ Hồ sơ bệnh án</a>
+                <a href="/profile" class="nav-item">◒ Đồ thị phục hồi</a>
+                <a href="/game" class="nav-item">⌁ Penalty 3D</a>
+            </nav>
+            
+            <div class="sidebar-bottom">
+                <a href="/logout" class="nav-item danger">↪ Đăng xuất</a>
+            </div>
+        </aside>
 
-                <div id="calibBanner" style="display:none; background:#FFF4E5; color:#C2410C; padding:14px; border-radius:12px; text-align:center; font-weight:600; margin-bottom:15px; font-size:15px; border:1px solid #FFE0B2;">
-                    ⏳ ĐANG XÁC ĐỊNH BIAS — GIỮ YÊN CHÂN, ĐỪNG ĐỘNG (vừa bấm nút EN trên ESP32)
+        <!-- ===== BÊN PHẢI: NỘI DUNG CHÍNH ===== -->
+        <main>
+            <header class="topbar">
+                <div class="crumb"><span>Phục hồi của tôi</span><b>/</b><strong>Đo biên độ</strong></div>
+                <div class="top-status">
+                    <span class="week-chip">TUẦN {{ week }}</span>
+                    <span class="connection camera"><i></i>Camera · 30 FPS</span>
+                    <button class="bell">🔔<em></em></button>
+                </div>
+            </header>
+
+            <section class="content">
+                <div class="title-row">
+                    <div>
+                        <p class="eyebrow">PHIÊN TẬP HÔM NAY</p>
+                        <h1>Đo biên độ khớp gối</h1>
+                        <p class="subtitle">Thực hiện theo từng bước để có kết quả chính xác nhất.</p>
+                    </div>
+                    <div class="goal">
+                        <span>Mục tiêu ROM</span>
+                        <b>{{ target }}</b>
+                    </div>
                 </div>
 
+                <!-- STEPPER -->
                 <div class="stepper">
-                    <div class="step active" id="ind1">① Đo Camera</div>
-                    <div class="step" id="ind2">② Đo Cảm biến</div>
-                    <div class="step" id="ind3">③ So sánh</div>
+                    <div class="step active" id="ind1"><span class="step-num">1</span> <span>Đo qua AI Camera</span></div>
+                    <div class="step-line"></div>
+                    <div class="step" id="ind2"><span class="step-num">2</span> <span>Đo qua IMU</span></div>
+                    <div class="step-line"></div>
+                    <div class="step" id="ind3"><span class="step-num">3</span> <span>Phân tích kết quả</span></div>
                 </div>
 
-                <!-- ===== BƯỚC 1: CAMERA ===== -->
-                <div id="step1">
-                    <p style="color:var(--muted);">Bước 1: Đứng/ngồi trước camera và thực hiện gập–duỗi gối. Hệ thống ghi lại góc lớn nhất bằng MediaPipe.</p>
-                    <div class="leg-controls" style="display:flex; gap:8px; align-items:center; margin-bottom:10px;">
-                        <span style="color:var(--muted); font-size:14px;">🦵 Đo chân:</span>
-                        <button onclick="setLeg('left', this)" class="legbtn" id="legBtn-left">Chân trái</button>
-                        <button onclick="setLeg('right', this)" class="legbtn" id="legBtn-right">Chân phải</button>
-                        <button onclick="setLeg('auto', this)" class="legbtn legbtn-active" id="legBtn-auto">Tự động</button>
-                    </div>
-                    <div style="display:flex; gap:8px; align-items:center; margin-bottom:12px; flex-wrap:wrap;">
-                        <button onclick="toggleCrowd(this)" class="legbtn" id="crowdBtn" style="font-size:13px;">👥 Chế độ đông người</button>
-                    </div>
-                    <img id="cameraFeed" class="video-box" alt="Hình ảnh camera theo dõi chuyển động chân"><p id="cameraStatus" role="status" style="color:var(--muted);font-size:13px;">Đang kết nối camera…</p>
-                    <div class="live-row">
-                        <div>Góc hiện tại: <b id="liveAngle" style="color:var(--primary);">0°</b></div>
-                        <div>Lớn nhất: <b id="maxRomSession" style="color:var(--amber);">0°</b></div>
-                    </div>
-                    <button class="btn btn-success" onclick="finishCamera(this)">✓ Hoàn tất đo Camera → chuyển sang Cảm biến</button>
-                </div>
+                <!-- CALIB BANNER -->
+                <div id="calibBanner" class="toast" style="display:none;">⏳ ĐANG XÁC ĐỊNH BIAS — GIỮ YÊN CHÂN...</div>
 
-                <!-- ===== BƯỚC 2: CẢM BIẾN IMU ===== -->
-                <div id="step2" style="display:none;">
-                    <p style="color:var(--muted);">Bước 2: Đeo cảm biến vào đùi và cẳng chân. Bấm <b>① Duỗi thẳng</b> rồi <b>② Trục gập</b>, sau đó tập gập–duỗi.</p>
-                    <!-- Chọn kiểu kết nối: USB hoặc WiFi (đổi được lúc đang chạy) -->
-                    <div style="display:flex; gap:8px; margin-bottom:10px;">
-                        <button onclick="setImuMode('serial', this)" class="legbtn {{ '' if imu_mode == 'wifi' else 'legbtn-active' }}" id="modeBtn-serial" style="flex:1;">🔌 USB (dây)</button>
-                        <button onclick="setImuMode('wifi', this)" class="legbtn {{ 'legbtn-active' if imu_mode == 'wifi' else '' }}" id="modeBtn-wifi" style="flex:1;">🛜 WiFi (không dây)</button>
-                    </div>
-                    <div id="usbBox" style="display:{{ 'none' if imu_mode == 'wifi' else 'flex' }}; gap:8px; align-items:center; margin-bottom:12px;">
-                        <label for="portSelect" style="color:var(--muted); font-size:13px; white-space:nowrap;">🔌 Cổng:</label>
-                        <select id="portSelect" style="flex:1; padding:10px; border-radius:10px; background:#fff; color:var(--ink); border:1.5px solid var(--line); font-family:inherit;"></select>
-                        <button onclick="connectPort(this)" style="background:var(--primary); color:#fff; border:none; padding:9px 15px; border-radius:10px; cursor:pointer; font-weight:600; font-family:inherit;">Kết nối</button>
-                        <button onclick="loadPorts(this)" style="background:var(--soft); color:var(--ink); border:1px solid var(--line); padding:9px 13px; border-radius:10px; cursor:pointer;" title="Làm mới danh sách cổng">↻</button>
-                    </div>
-                    <div id="wifiBox" style="display:{{ 'flex' if imu_mode == 'wifi' else 'none' }}; gap:8px; align-items:center; margin-bottom:12px; background:#EAF3FF; padding:12px; border-radius:12px; border:1px solid var(--line);">
-                        <span style="color:var(--primary); font-weight:700;">🛜 WiFi:</span>
-                        <span style="flex:1; color:var(--muted);">Nối máy tính vào WiFi <b style="color:var(--ink);">ACL_Knee</b> (mật khẩu <b style="color:var(--ink);">12345678</b>)</span>
-                        <button onclick="reconnectImu(this)" style="background:var(--primary); color:#fff; border:none; padding:9px 15px; border-radius:10px; cursor:pointer; font-weight:600; font-family:inherit;">Kết nối lại</button>
-                    </div>
-                    <p>Trạng thái cảm biến: <span id="imuStatus" class="status-badge">● mất kết nối</span></p>
-                    <div class="rom-text" id="liveImuAngle" style="color:var(--green);">0°</div>
-                    <p style="text-align:center; color:var(--muted); margin:0;">Lớn nhất: <span id="maxImuSession" style="color:var(--amber); font-weight:700;">0°</span></p>
-                    <p id="stability" style="text-align:center; font-weight:600; margin:12px 0;">—</p>
-                    <div class="cal-buttons">
-                        <button onclick="imuCmd('C', this)" style="background:var(--primary);">① Calib - Duỗi thẳng (C)</button>
-                        <button onclick="imuCmd('L', this)" style="background:var(--green);">② Bắt đầu ghi gập (L)</button>
-                    </div>
-                    <button class="btn btn-success" onclick="finishSensor(this)">✓ Lưu kết quả Cảm biến → Xem so sánh</button>
-                </div>
-
-                <!-- ===== BƯỚC 3: SO SÁNH ===== -->
-                <div id="step3" style="display:none;">
-                    <h3 style="color:var(--primary);">Kết quả 2 phương pháp đo</h3>
-                    <div class="compare-box">
-                        <div class="compare-item">
-                            <div style="color:var(--muted);">📷 Camera</div>
-                            <div class="big" id="resCam" style="color:var(--primary);">0°</div>
+                <div class="workspace">
+                    <!-- BẢNG ĐO CHÍNH (THAY ĐỔI THEO STEP) -->
+                    <section class="measurement-panel">
+                        
+                        <!-- ==== STEP 1: CAMERA ==== -->
+                        <div id="step1">
+                            <div class="panel-head">
+                                <div><h2>AI Camera đang theo dõi</h2><p>Đặt toàn bộ chân trong khung hình.</p></div>
+                                <span class="live"><i></i>TRỰC TIẾP</span>
+                            </div>
+                            
+                            <div class="video-frame">
+                                <img id="cameraFeed" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1;" alt="Camera luồng video">
+                                <div class="frame-grid"></div>
+                                <div class="camera-label"><i></i> Camera trước · Đã căn chỉnh</div>
+                                
+                                <!-- Decorative Person Wireframe -->
+                                <div class="person">
+                                    <div class="head"></div><div class="torso"></div><div class="arm left-arm"></div><div class="arm right-arm"></div>
+                                    <div class="leg thigh"></div><div class="leg shin"></div><div class="joint hip"></div><div class="joint knee"></div><div class="joint ankle"></div>
+                                </div>
+                                
+                                <div class="video-bottom">
+                                    <div class="leg-switch">
+                                        <button class="legbtn" id="legBtn-left" onclick="setLeg('left', this)">Trái</button>
+                                        <button class="legbtn" id="legBtn-right" onclick="setLeg('right', this)">Phải</button>
+                                        <button class="legbtn legbtn-active" id="legBtn-auto" onclick="setLeg('auto', this)">Tự động</button>
+                                    </div>
+                                    <button class="filter" id="crowdBtn" onclick="toggleCrowd(this)"><span></span> Lọc nhiễu</button>
+                                </div>
+                            </div>
+                            <p id="cameraStatus" style="text-align:center; color:var(--muted); font-size:12px; margin-top:10px;">Đang kết nối camera…</p>
+                            
+                            <div class="measurement-bottom">
+                                <div class="rom-metric">
+                                    <span>BIÊN ĐỘ HIỆN TẠI</span>
+                                    <b id="liveAngle">0°</b>
+                                    <small>Đỉnh phiên: <strong id="maxRomSession">0°</strong></small>
+                                </div>
+                                <div class="gauge">
+                                    <div class="gauge-arc"></div><div class="gauge-marker"></div><span>0°</span><span>120°</span>
+                                </div>
+                                <button onclick="finishCamera(this)" style="background:var(--blue); color:#fff; border:none; border-radius:8px; font-weight:700; height:100%;">✓ Hoàn tất đo Camera</button>
+                            </div>
                         </div>
-                        <div class="compare-item">
-                            <div style="color:var(--muted);">🦵 Cảm biến</div>
-                            <div class="big" id="resImu" style="color:var(--green);">0°</div>
-                        </div>
-                        <div class="compare-item">
-                            <div style="color:var(--muted);">Chênh lệch</div>
-                            <div class="big" id="resDiff" style="color:var(--amber);">0°</div>
-                        </div>
-                    </div>
-                    <p id="resVerdict" style="text-align:center; font-weight:700; margin:8px 0;">—</p>
-                    <p style="color:var(--muted); text-align:center;">Cả hai kết quả đã được lưu vào hồ sơ để bác sĩ đối chiếu.</p>
-                    <button class="btn btn-profile" onclick="restart(this)">↻ Đo lại từ đầu</button>
-                </div>
-            </div>
 
-            <div class="table-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
-                    <div class="table-title" style="margin:0;">📋 Nhật ký các lượt đo</div>
-                    <div style="display:flex; gap:8px;">
-                        <a href="/export_compare_me" style="background:var(--primary); color:#fff; padding:8px 14px; border-radius:10px; text-decoration:none; font-weight:600; font-size:13px;">⬇ Xuất Excel (có biểu đồ)</a>
-                        <button onclick="deleteAll(this)" style="background:#FDECEC; color:#E0413A; border:none; padding:8px 14px; border-radius:10px; cursor:pointer; font-weight:600; font-size:13px; font-family:inherit;">🗑️ Xóa tất cả</button>
-                    </div>
+                        <!-- ==== STEP 2: IMU SENSOR ==== -->
+                        <div id="step2" style="display:none;">
+                            <div class="panel-head">
+                                <div>
+                                    <h2>Cảm biến IMU đang theo dõi</h2>
+                                    <p style="margin-top:8px;">Trạng thái: <span id="imuStatus" class="connected" style="display:inline-flex; padding:4px 8px;">● mất kết nối</span></p>
+                                </div>
+                                <span class="live" style="background:#e8f4fd; color:var(--blue);"><i></i>TRỰC TIẾP</span>
+                            </div>
+                            
+                            <div class="mode-tabs" style="margin: 0 14px 10px;">
+                                <button id="modeBtn-serial" onclick="setImuMode('serial', this)" class="legbtn {{ '' if imu_mode == 'wifi' else 'legbtn-active' }}">🔌 USB Serial COM</button>
+                                <button id="modeBtn-wifi" onclick="setImuMode('wifi', this)" class="legbtn {{ 'legbtn-active' if imu_mode == 'wifi' else '' }}">🛜 WiFi · ACL_Knee</button>
+                            </div>
+                            
+                            <!-- USB Box -->
+                            <div id="usbBox" class="calibration" style="display:{{ 'none' if imu_mode == 'wifi' else 'flex' }}; margin: 0 14px; background:var(--pale); border-radius:8px;">
+                                <select id="portSelect" style="flex:1; padding:8px; border:1px solid var(--line); border-radius:6px; font-family:inherit; font-size:11px;"></select>
+                                <button onclick="connectPort(this)" style="background:var(--blue); color:#fff; border:none; padding:8px 12px; border-radius:6px; font-size:11px; font-weight:700;">Kết nối</button>
+                                <button onclick="loadPorts(this)" style="background:#fff; color:var(--muted); border:1px solid var(--line); padding:8px 12px; border-radius:6px; font-size:11px;">↻</button>
+                            </div>
+                            
+                            <!-- WiFi Box -->
+                            <div id="wifiBox" class="calibration" style="display:{{ 'flex' if imu_mode == 'wifi' else 'none' }}; margin: 0 14px; background:var(--pale); border-radius:8px;">
+                                <p style="flex:1;"><b>WiFi kết nối máy tính: ACL_Knee</b><small>Mật khẩu: 12345678</small></p>
+                                <button onclick="reconnectImu(this)" style="background:var(--blue); color:#fff; border:none; padding:8px 12px; border-radius:6px; font-size:11px; font-weight:700;">Kết nối lại</button>
+                            </div>
+
+                            <div style="height: 140px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                                <div id="liveImuAngle" style="font-size:64px; font-weight:800; color:var(--green); font-family:'DM Mono', monospace; line-height:1;">0°</div>
+                                <p id="stability" style="color:var(--muted); font-size:12px; font-weight:600; margin-top:8px;">—</p>
+                            </div>
+
+                            <div class="measurement-bottom" style="grid-template-columns:1fr 1fr;">
+                                <div class="rom-metric">
+                                    <span>ĐỈNH PHIÊN IMU</span>
+                                    <b id="maxImuSession" style="color:var(--green);">0°</b>
+                                </div>
+                                <div style="display:flex; flex-direction:column; gap:8px;">
+                                    <div style="display:flex; gap:8px;">
+                                        <button onclick="imuCmd('C', this)" style="flex:1; background:var(--dark); color:#fff; border:none; padding:10px; border-radius:8px; font-size:11px; font-weight:700;">① Calib</button>
+                                        <button onclick="imuCmd('L', this)" style="flex:1; background:var(--green); color:#fff; border:none; padding:10px; border-radius:8px; font-size:11px; font-weight:700;">② Ghi góc</button>
+                                    </div>
+                                    <button onclick="finishSensor(this)" style="background:var(--blue); color:#fff; border:none; padding:10px; border-radius:8px; font-size:11px; font-weight:700;">✓ Hoàn tất đo IMU</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ==== STEP 3: COMPARISON ==== -->
+                        <div id="step3" style="display:none;">
+                            <div class="panel-head">
+                                <div><h2>Đối chiếu & phân tích</h2><p>Kết quả hai phương pháp đo trong phiên này.</p></div>
+                                <span class="reliable">✓ Đã lưu hồ sơ</span>
+                            </div>
+                            
+                            <div class="comparison" style="margin: 30px 14px;">
+                                <div><span>CAMERA AI</span><b class="cyan" id="resCam">0°</b></div>
+                                <div><span>IMU SENSOR</span><b class="green" id="resImu">0°</b></div>
+                                <div><span>ĐỘ LỆCH</span><b id="resDiff">0°</b></div>
+                            </div>
+                            
+                            <p id="resVerdict" style="text-align:center; font-weight:700; color:var(--ink); margin:20px 0;">—</p>
+                            
+                            <div style="padding: 0 22px 22px;">
+                                <button onclick="restart(this)" style="width:100%; background:var(--blue); color:#fff; border:none; padding:12px; border-radius:8px; font-weight:700; font-size:12px;">↻ Đo lại từ đầu</button>
+                            </div>
+                        </div>
+
+                    </section>
+
+                    <!-- ==== CỘT PHẢI: HỒ SƠ BỆNH NHÂN ==== -->
+                    <aside class="patient-side">
+                        <div class="profile-card">
+                            <div class="profile-top">
+                                <span class="avatar">{{ name[0] if name else 'B' }}</span>
+                                <div><h3>{{ name }}</h3><p>{{ age }} tuổi · Giai đoạn {{ phase }}</p></div>
+                            </div>
+                            <div class="progress-label"><span>Tiến độ tuần {{ week }}</span><b>Khá tốt</b></div>
+                            <div class="progress"><i></i></div>
+                        </div>
+                        
+                        <div class="directive">
+                            <span class="quote">“</span>
+                            <p><b>Lời dặn của bác sĩ</b>{{ recommendation.muc_tieu }}</p>
+                            <ul style="padding-left:14px; margin-top:6px; font-size:10px; color:#938765;">
+                            {% for advice in recommendation.loi_khuyen %}
+                                <li>{{ advice }}</li>
+                            {% endfor %}
+                            </ul>
+                        </div>
+                        
+                        <div class="quick-actions">
+                            <h3>Truy cập nhanh</h3>
+                            <a href="/game" style="text-decoration:none;"><button><span>⚽</span><div><b>Penalty 3D</b><small>Tập phản hồi sinh học</small></div><i>›</i></button></a>
+                            <a href="/my_records" style="text-decoration:none;"><button><span>▣</span><div><b>Hồ sơ bệnh án</b><small>Xem lịch sử điều trị</small></div><i>›</i></button></a>
+                        </div>
+                    </aside>
                 </div>
-                <div class="table-scroll">
-                    <table id="realtime-log-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 50px; text-align: center;">STT</th>
-                                <th>Thời điểm</th>
-                                <th style="text-align: center;">Góc ROM</th>
-                                <th style="text-align: center;">Nguồn</th>
-                                <th style="width: 50px; text-align: center;">Xóa</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% if history %}
-                                {% for row in history %}
+
+                <!-- ==== NHẬT KÝ TELEMETRY ==== -->
+                <section class="logs">
+                    <div class="logs-head">
+                        <div><h2>Nhật ký telemetry</h2><p>Dữ liệu phiên tập được lưu tự động</p></div>
+                        <div style="display:flex; gap:8px;">
+                            <a href="/export_compare_me" style="text-decoration:none;"><button>⇩ Xuất Excel</button></a>
+                            <button onclick="deleteAll(this)" style="background:#fff1f2; color:#ef4444; border:1px solid #fecdd3;">🗑️ Xóa tất cả</button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-wrap">
+                        <table id="realtime-log-table">
+                            <thead>
                                 <tr>
-                                    <td style="text-align: center; font-weight: bold; color: var(--muted);">{{ loop.index }}</td>
-                                    <td>{{ row[1] }}</td>
-                                    <td style="text-align: center; color: var(--green); font-weight: bold;">{{ row[0] }}°</td>
-                                    <td style="text-align: center; color: var(--muted);">{{ '🦵 Cảm biến' if row[2] == 'imu' else '📷 Camera' }}</td>
-                                    <td style="text-align: center;"><button onclick="deleteMeasurement({{ row[3] }}, this)" style="background:none; border:none; cursor:pointer; font-size:16px;" title="Xóa lượt đo này">🗑️</button></td>
+                                    <th>STT</th>
+                                    <th>THỜI ĐIỂM</th>
+                                    <th>GÓC ĐO</th>
+                                    <th>NGUỒN DỮ LIỆU</th>
+                                    <th>HÀNH ĐỘNG</th>
                                 </tr>
-                                {% endfor %}
-                            {% else %}
-                                <tr id="no-data-row">
-                                    <td colspan="5" style="text-align: center; color: var(--muted); padding: 20px;">Chưa có lượt đo nào.</td>
-                                </tr>
-                            {% endif %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+                            </thead>
+                            <tbody>
+                                {% if history %}
+                                    {% for row in history %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td>{{ row[1] }}</td>
+                                        <td><span style="font-size:14px; font-weight:800; color:var(--ink);">{{ row[0] }}°</span></td>
+                                        <td>
+                                            {% if row[2] == 'imu' %}
+                                                <span class="logged" style="background:#e8f8f0; color:#0c9c6a;">🦵 Cảm biến IMU</span>
+                                            {% else %}
+                                                <span class="logged" style="background:#e0f2fe; color:#0284c7;">📷 Camera AI</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <button onclick="deleteMeasurement({{ row[3] }}, this)" style="background:transparent; border:none; cursor:pointer; color:#ef4444; font-size:14px;" title="Xóa lượt đo này">🗑️</button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr id="no-data-row">
+                                        <td colspan="5" style="text-align:center;">Chưa có lượt đo nào trong phiên này.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
 
-        <div style="display:flex; flex-direction:column; gap:24px;">
-            <div class="card">
-                <h3 style="margin-top:0; color:var(--primary);">👤 Thông tin bệnh nhân</h3>
-                <p>Họ tên: <b>{{ name }}</b> | Tuổi: <b>{{ age }} tuổi</b></p>
-                <p>Tiến trình: <span class="pill">Tuần {{ week }}</span></p>
-                <hr style="border:none; border-top:1px solid var(--line);">
-                <p>Giai đoạn: <b style="color:var(--primary);">{{ phase }}</b></p>
-                <p>Biên độ mục tiêu: <b style="color:var(--green);">{{ target }}</b></p>
-                <p>Định hướng điều trị: <i style="color:var(--muted);">{{ recommendation.muc_tieu }}</i></p>
-                <p>Lời khuyên bác sĩ:</p>
-                <ul>
-                    {% for advice in recommendation.loi_khuyen %}
-                        <li>{{ advice }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-
-            <div style="display:flex; gap:12px; flex-wrap:wrap;">
-                <a href="/game" class="btn" style="flex:1; background:linear-gradient(135deg,#F59E0B,#EF6C00); color:#fff;">🎮 GAME</a>
-                <a href="/my_records" class="btn" style="flex:1; background:var(--teal); color:#fff;">📁 HỒ SƠ</a>
-                <a href="/profile" class="btn btn-profile" style="flex:1;">📊 ĐỒ THỊ</a>
-                <a href="/logout" class="btn btn-logout" style="flex:1;">ĐĂNG XUẤT</a>
-            </div>
-        </div>
+            </section>
+        </main>
     </div>
 
+    <!-- Script defer remains exactly the same -->
     <script src="{{ url_for('static', filename='dashboard.js') }}" defer></script>
 </body>
 </html>

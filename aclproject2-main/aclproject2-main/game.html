@@ -4,120 +4,168 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BME Rehab · Penalty 3D</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="/static/three.min.js" onerror="var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';document.head.appendChild(s);"></script>
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='rehab.css') }}">
+<script src="{{ url_for('static', filename='rehab.js') }}"></script>
 <style>
-  :root{--primary:#0E82FD;--green:#16A34A;--amber:#F59E0B;--ink:#1B2559;}
-  *{box-sizing:border-box;}
-  body{font-family:'Poppins','Segoe UI',Arial,sans-serif;background:radial-gradient(circle at 50% -10%,#1b2a52,#0b1020);color:#fff;margin:0;padding:16px;}
-  .wrap{max-width:1040px;margin:auto;}
-  .top{display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,#16A34A,#0E82FD);padding:13px 20px;border-radius:16px;box-shadow:0 14px 32px rgba(0,0,0,.4);margin-bottom:14px;flex-wrap:wrap;gap:8px;}
-  .top h1{margin:0;font-size:19px;font-weight:800;}
-  .top p{margin:3px 0 0;font-size:12.5px;color:rgba(255,255,255,.92);}
-  .btn{border:none;border-radius:12px;padding:9px 15px;font-weight:700;font-family:inherit;cursor:pointer;font-size:14px;}
-  .btn-back{background:rgba(255,255,255,.2);color:#fff;text-decoration:none;}
-  .stage{position:relative;border-radius:16px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.5);background:#0a0f1e;}
-  #view{width:100%;height:560px;display:block;}
-  .loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#9fb0d6;font-weight:700;}
-  .hud{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none;font-weight:800;text-shadow:0 2px 6px rgba(0,0,0,.7);}
-  .hud .pill{background:rgba(0,0,0,.45);border-radius:12px;padding:8px 14px;font-size:15px;}
-  .center{position:absolute;top:38%;left:0;right:0;text-align:center;font-weight:800;font-size:52px;color:#FFD54A;text-shadow:0 4px 14px rgba(0,0,0,.7);pointer-events:none;opacity:0;transition:opacity .15s;}
-  .gauge{position:absolute;left:14px;bottom:14px;background:rgba(6,12,24,.66);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:10px 12px;text-align:center;}
-  .gauge .gtitle{font-size:10px;letter-spacing:1.2px;color:#9fb0d6;font-weight:800;}
-  .gauge .gval{font-size:22px;font-weight:800;color:#FFD54A;margin:2px 0 6px;line-height:1;}
-  .gbody{position:relative;display:flex;align-items:flex-end;gap:6px;height:210px;}
-  .gticks{position:relative;width:24px;height:100%;}
-  .gticks span{position:absolute;right:0;transform:translateY(50%);font-size:9.5px;color:#8ea3cc;}
-  .gbar{position:relative;width:20px;height:100%;background:rgba(0,0,0,.55);border:1.5px solid rgba(255,255,255,.45);border-radius:10px;overflow:hidden;}
-  .gzone{position:absolute;left:0;width:100%;background:rgba(22,163,74,.9);border-top:2px solid #7CFFB2;border-bottom:2px solid #7CFFB2;}
-  .gfill{position:absolute;left:0;bottom:0;width:100%;background:linear-gradient(#FFE082,#FFB300);transition:height .06s linear;}
-  .gmark{position:absolute;left:-3px;width:26px;height:2px;background:#fff;box-shadow:0 0 6px #fff;transition:bottom .06s linear;}
-  .ghint{margin-top:6px;font-size:10px;color:#9fb0d6;max-width:100px;line-height:1.3;}
-  .goalbox{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px 14px;font-size:13.5px;}
-  .goalbox input{width:64px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 8px;font-family:inherit;font-weight:700;text-align:center;}
-  .gbtn{background:rgba(255,255,255,.12);color:#fff;border:none;border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer;font-family:inherit;font-size:12.5px;}
-  .gbtn.save{background:var(--green);}
-  .ginfo{color:#9fb0d6;font-size:12.5px;}
-  .controls{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
-  .src{flex:1;background:rgba(255,255,255,.08);color:#fff;border:1.5px solid rgba(255,255,255,.15);border-radius:12px;padding:10px;font-weight:700;cursor:pointer;font-family:inherit;font-size:13px;}
-  .src.active{background:var(--primary);border-color:var(--primary);}
-  .rowbtn{display:flex;gap:8px;margin-top:8px;}
-  .start{flex:2;background:var(--green);color:#fff;padding:13px;font-size:16px;border-radius:12px;}
-  .auto{flex:1;background:rgba(255,255,255,.1);color:#fff;padding:13px;border-radius:12px;}
-  .hint{margin-top:8px;font-size:12.5px;color:#9fb0d6;text-align:center;}
-  .overlay{position:fixed;inset:0;background:rgba(5,10,20,.8);display:none;align-items:center;justify-content:center;z-index:30;}
-  .modal{background:#141c34;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:26px;max-width:400px;width:92%;text-align:center;}
-  .modal h2{margin:0 0 6px;color:#FFD54A;}
-  .kv{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.1);font-size:15px;}
+  /* Cyber-Sport Game Custom Overrides */
+  .game-container { max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+  .game-top { 
+    display: flex; justify-content: space-between; align-items: center; 
+    background: radial-gradient(ellipse at center, #1b3049, #091321); padding: 20px 24px; 
+    border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 16px 40px rgba(16, 35, 62, 0.15); flex-wrap: wrap; gap: 12px; color: #fff;
+  }
+  .game-top h1 { margin: 0; font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+  .game-top p { margin: 4px 0 0; font-size: 13px; color: #9fb0d6; font-family: 'DM Mono', monospace; }
+  
+  .stage { position: relative; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 50px rgba(9, 19, 33, 0.4); background: #050a12; }
+  #view { width: 100%; height: 560px; display: block; }
+  .loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #9fb0d6; font-weight: 700; }
+  .hud { position: absolute; top: 16px; left: 16px; right: 16px; display: flex; justify-content: space-between; pointer-events: none; font-weight: 800; font-family: 'DM Mono'; }
+  .hud .pill { background: rgba(11, 23, 38, 0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 16px; font-size: 14px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5); backdrop-filter: blur(8px); }
+  .center { position: absolute; top: 38%; left: 0; right: 0; text-align: center; font-weight: 800; font-size: 64px; color: #FFD54A; text-shadow: 0 4px 20px rgba(0,0,0,.8); pointer-events: none; opacity: 0; transition: opacity .15s; letter-spacing: -2px; }
+  
+  .gauge { position: absolute; left: 16px; bottom: 16px; background: rgba(11, 23, 38, 0.7); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 12px 14px; text-align: center; backdrop-filter: blur(8px); }
+  .gauge .gtitle { font-size: 10px; letter-spacing: 1px; color: #9fb0d6; font-weight: 700; font-family: 'DM Mono'; }
+  .gauge .gval { font-size: 26px; font-weight: 800; color: #00c5cf; margin: 4px 0 8px; line-height: 1; font-family: 'DM Mono'; }
+  .gbody { position: relative; display: flex; align-items: flex-end; gap: 8px; height: 210px; }
+  .gticks { position: relative; width: 26px; height: 100%; }
+  .gticks span { position: absolute; right: 0; transform: translateY(50%); font-size: 10px; color: #728094; font-family: 'DM Mono'; }
+  .gbar { position: relative; width: 22px; height: 100%; background: rgba(0,0,0,.55); border: 1.5px solid rgba(255,255,255,.2); border-radius: 11px; overflow: hidden; }
+  .gzone { position: absolute; left: 0; width: 100%; background: rgba(13, 186, 120, 0.85); border-top: 2px solid #00ff9d; border-bottom: 2px solid #00ff9d; box-shadow: 0 0 15px rgba(13, 186, 120, 0.5); }
+  .gfill { position: absolute; left: 0; bottom: 0; width: 100%; background: linear-gradient(#00c5cf, #0e6fff); transition: height .06s linear; }
+  .gmark { position: absolute; left: -4px; width: 30px; height: 3px; background: #fff; box-shadow: 0 0 8px #fff; transition: bottom .06s linear; border-radius: 2px; }
+  .ghint { margin-top: 8px; font-size: 10px; color: #9fb0d6; max-width: 110px; line-height: 1.4; }
+  
+  .game-panel { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; box-shadow: 0 4px 24px rgba(16, 35, 62, 0.03); }
+  
+  .controls { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; }
+  .src { flex: 1; background: #f4f7fa; color: #52657a; border: 1px solid var(--line); border-radius: 10px; padding: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+  .src.active { background: var(--blue); color: #fff; border-color: var(--blue); box-shadow: 0 4px 12px rgba(14,111,255,0.25); }
+  .rowbtn { display: flex; gap: 10px; }
+  .start { flex: 2; background: #0dba78; color: #fff; padding: 14px; font-size: 16px; border-radius: 12px; font-weight: 800; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(13,186,120,0.25); transition: 0.2s; }
+  .start:hover { filter: brightness(1.05); transform: translateY(-1px); }
+  .auto { flex: 1; background: #fff; color: var(--ink); border: 1px solid var(--line); padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+  .auto:hover { border-color: var(--blue); color: var(--blue); }
+  
+  .goalbox { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 15px; background: #f8fafc; border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; font-size: 13px; }
+  .goalbox input { width: 70px; background: #fff; border: 1px solid #d5dee9; color: var(--ink); border-radius: 8px; padding: 8px; font-family: 'DM Mono'; font-weight: 700; text-align: center; margin: 0 4px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.03); }
+  .gbtn { background: #fff; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 9px 14px; font-weight: 600; cursor: pointer; font-size: 12px; transition: 0.2s; }
+  .gbtn:hover { background: #f2f7ff; color: var(--blue); border-color: var(--blue); }
+  .gbtn.save { background: var(--blue); color: #fff; border: none; box-shadow: 0 2px 8px rgba(14,111,255,0.2); }
+  .gbtn.save:hover { filter: brightness(1.05); color: #fff; }
+  .ginfo { color: #6d7d92; font-size: 12px; margin-left: auto; }
+  .hint { margin-top: 12px; font-size: 12px; color: #8794a5; text-align: center; }
+  
+  .overlay { position: fixed; inset: 0; background: rgba(9, 19, 33, 0.85); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(5px); }
+  .modal { background: #fff; border-radius: 20px; padding: 32px; max-width: 400px; width: 92%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+  .modal h2 { margin: 0 0 8px; color: var(--ink); font-size: 24px; font-weight: 800; letter-spacing: -1px; }
+  .kv { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 14px; color: #52657a; font-weight: 600; }
+  .kv b { color: var(--ink); font-family: 'DM Mono'; font-size: 16px; }
 </style>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='rehab.css') }}">
-    <script src="{{ url_for('static', filename='rehab.js') }}"></script>
 </head>
 <body>
-    <noscript><p class="empty-state">Vui lòng bật JavaScript để dùng dữ liệu trực tiếp và các nút điều khiển.</p></noscript>
-<div class="wrap">
-  <div class="top">
-    <div>
-      <h1>⚽ Penalty 3D — Gập đúng lực để sút</h1>
-      <p>Tuần {{ week }} · Gập tới <b>{{ target }}°</b> (±{{ tol }}°) mới sút được · canh vòng ngắm né thủ môn · 5 lượt</p>
-    </div>
-    <a href="/dashboard" class="btn btn-back">⬅ Về phòng tập</a>
-  </div>
+    <noscript><p class="empty-state">Vui lòng bật JavaScript để dùng ứng dụng.</p></noscript>
+    <div class="app-shell">
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark"><span></span><span></span><span></span></div>
+                <span>Knee<span>ROM</span></span>
+            </div>
+            
+            <nav>
+                <a href="/dashboard" class="nav-item">▣ Đo biên độ</a>
+                <a href="/my_records" class="nav-item">⌂ Hồ sơ bệnh án</a>
+                <a href="/profile" class="nav-item">◒ Đồ thị phục hồi</a>
+                <a href="/game" class="nav-item selected">⌁ Penalty 3D</a>
+            </nav>
+            
+            <div class="sidebar-bottom">
+                <a href="/logout" class="nav-item danger">↪ Đăng xuất</a>
+            </div>
+        </aside>
 
-  <div class="stage">
-    <canvas id="view"></canvas>
-    <div class="loading" id="loading">Đang tải sân 3D…</div>
-    <div class="hud">
-      <div class="pill">⚽ <span id="goals">0</span> · 🎯 <span id="shots">0/5</span></div>
-      <div class="pill">🔥 <span id="streak">0</span> · 📈 <span id="best">0°</span></div>
-    </div>
-    <div class="center" id="center"></div>
-    <div class="gauge">
-      <div class="gtitle">GÓC GẬP</div>
-      <div class="gval" id="gval">0°</div>
-      <div class="gbody">
-        <div class="gticks" id="gticks"></div>
-        <div class="gbar"><div class="gzone" id="zone"></div><div class="gfill" id="fill"></div><div class="gmark" id="gmark"></div></div>
-      </div>
-      <div class="ghint" id="ghint">gập tới vùng xanh để sút</div>
-    </div>
-  </div>
+        <!-- ===== MAIN CONTENT ===== -->
+        <main>
+            <header class="topbar">
+                <div class="crumb"><span>Phục hồi của tôi</span><b>/</b><strong>Penalty 3D</strong></div>
+                <div class="top-status">
+                    <span class="week-chip">TUẦN {{ week }}</span>
+                    <button class="bell">🔔<em></em></button>
+                </div>
+            </header>
 
-  <div class="controls">
-    <button class="src" id="src-cam" onclick="setSrc('cam',this)">📷 Camera</button>
-    <button class="src" id="src-imu" onclick="setSrc('imu',this)">🦵 Cảm biến</button>
-    <button class="src active" id="src-demo" onclick="setSrc('demo',this)">🕹️ Demo</button>
-  </div>
-  <div class="rowbtn">
-    <button class="btn start" id="startBtn" onclick="startGame()">▶ VÀO SÂN</button>
-    <button class="btn auto" id="autoBtn" onclick="toggleAuto()">🤖 Auto: TẮT</button>
-  </div>
-  <div class="goalbox">
-    <span>🎯 <b>Mục tiêu riêng của bệnh nhân:</b></span>
-    <span>đạt <input id="goalInput" type="number" min="30" max="150" value="{{ goal if goal else default_target }}">° trong
-      <input id="daysInput" type="number" min="1" max="180" value="{{ goal_days }}"> ngày</span>
-    <button class="gbtn save" onclick="saveGoal()">Lưu mục tiêu</button>
-    <button class="gbtn" onclick="clearGoal()">Dùng mặc định theo tuần</button>
-    <span class="ginfo" id="goalInfo">
-      {% if goal %}Đang dùng mục tiêu riêng <b style="color:#7CFFB2;">{{ goal }}°</b>{% if days_left != -999 %} · còn <b>{{ days_left }}</b> ngày{% endif %} · ROM tốt nhất: <b>{{ best_ever }}°</b>
-      {% else %}Đang dùng mặc định theo tuần {{ week }} ({{ target }}°) · ROM tốt nhất: <b>{{ best_ever }}°</b>{% endif %}
-    </span>
-  </div>
-  <div class="hint" id="hint">Demo: giữ <b>phím ↑</b> gập chân lấy lực — vào <b>vùng xanh</b> là tự sút. Bấm <b>Auto</b> để tự đá.</div>
-</div>
+            <section class="content">
+                <div class="game-container">
+                  <div class="game-top">
+                    <div>
+                      <h1>Penalty 3D — Trị liệu tương tác</h1>
+                      <p>Mục tiêu tuần {{ week }}: Gập chân đạt <b>{{ target }}°</b> (±{{ tol }}°) để thực hiện cú sút</p>
+                    </div>
+                  </div>
 
-<div class="overlay" id="overlay">
-  <div class="modal">
-    <h2 id="mtitle">Kết thúc!</h2>
-    <p id="verdict" style="color:#9fb0d6;"></p>
-    <div class="kv"><span>Bàn thắng</span><b id="mGoals">0/5</b></div>
-    <div class="kv"><span>ROM cao nhất</span><b id="mBest">0°</b></div>
-    <div class="kv"><span>Số lần gập đạt mục tiêu</span><b id="mReps">0</b></div>
-    <button class="btn start" id="saveBtn" style="width:100%;margin-top:14px;" onclick="saveResult()">💾 Lưu vào hồ sơ</button>
-    <button class="btn auto" style="width:100%;margin-top:8px;" onclick="location.reload()">↻ Chơi lại</button>
-  </div>
-</div>
+                  <div class="stage">
+                    <canvas id="view"></canvas>
+                    <div class="loading" id="loading">Đang nạp sân vận động 3D…</div>
+                    <div class="hud">
+                      <div class="pill">⚽ <span id="goals">0</span> · 🎯 <span id="shots">0/5</span></div>
+                      <div class="pill">🔥 <span id="streak">0</span> · 📈 <span id="best">0°</span></div>
+                    </div>
+                    <div class="center" id="center"></div>
+                    <div class="gauge">
+                      <div class="gtitle">GÓC GẬP</div>
+                      <div class="gval" id="gval">0°</div>
+                      <div class="gbody">
+                        <div class="gticks" id="gticks"></div>
+                        <div class="gbar"><div class="gzone" id="zone"></div><div class="gfill" id="fill"></div><div class="gmark" id="gmark"></div></div>
+                      </div>
+                      <div class="ghint" id="ghint">Gập tới vùng xanh để sút</div>
+                    </div>
+                  </div>
+
+                  <div class="game-panel">
+                      <div class="controls">
+                        <button class="src" id="src-cam" onclick="setSrc('cam',this)">📷 Camera</button>
+                        <button class="src" id="src-imu" onclick="setSrc('imu',this)">🦵 Cảm biến IMU</button>
+                        <button class="src active" id="src-demo" onclick="setSrc('demo',this)">🕹️ Chế độ Demo</button>
+                      </div>
+                      <div class="rowbtn">
+                        <button class="start" id="startBtn" onclick="startGame()">▶ BẮT ĐẦU TRẬN ĐẤU</button>
+                        <button class="auto" id="autoBtn" onclick="toggleAuto()">🤖 Auto: TẮT</button>
+                      </div>
+                      <div class="goalbox">
+                        <span>🎯 <b>Mục tiêu bệnh nhân:</b></span>
+                        <span>Đạt <input id="goalInput" type="number" min="30" max="150" value="{{ goal if goal else default_target }}">° trong
+                          <input id="daysInput" type="number" min="1" max="180" value="{{ goal_days }}"> ngày</span>
+                        <button class="gbtn save" onclick="saveGoal()">Lưu mục tiêu</button>
+                        <button class="gbtn" onclick="clearGoal()">Dùng mặc định</button>
+                        <span class="ginfo" id="goalInfo">
+                          {% if goal %}Mục tiêu tùy chỉnh: <b style="color:var(--blue);">{{ goal }}°</b>{% if days_left != -999 %} · Còn <b>{{ days_left }}</b> ngày{% endif %}
+                          {% else %}Mục tiêu tuần {{ week }}: <b>{{ target }}°</b>{% endif %}
+                        </span>
+                      </div>
+                      <div class="hint" id="hint">Chế độ Demo: Giữ <b>phím ↑</b> để lấy lực gập chân. Khi thanh lực đạt <b>vùng xanh</b> thì nhân vật sẽ tự sút. Bật <b>Auto</b> để máy tự chơi.</div>
+                  </div>
+                </div>
+
+                <div class="overlay" id="overlay">
+                  <div class="modal">
+                    <h2 id="mtitle">Kết thúc!</h2>
+                    <p id="verdict" style="color:var(--muted); margin-top:4px; font-size:13px;"></p>
+                    <div class="kv" style="margin-top:16px;"><span>Bàn thắng ghi được</span><b id="mGoals">0/5</b></div>
+                    <div class="kv"><span>Góc gập (ROM) tối đa</span><b id="mBest">0°</b></div>
+                    <div class="kv"><span>Số lần gập đạt chuẩn</span><b id="mReps">0</b></div>
+                    <button class="btn-primary" id="saveBtn" style="width:100%;margin-top:20px;padding:14px;" onclick="saveResult()">💾 Lưu vào hồ sơ</button>
+                    <button class="btn-secondary" style="width:100%;margin-top:10px;padding:14px;" onclick="location.reload()">↻ Chơi lại</button>
+                  </div>
+                </div>
+            </section>
+        </main>
+    </div>
 
 <script>
 async function gameFetch(url, options = {}) {
@@ -151,7 +199,7 @@ function crowdTex(){const c=document.createElement('canvas');c.width=256;c.heigh
 
 function limb(len,rTop,rBot,mat){const m=new THREE.Mesh(new THREE.CylinderGeometry(rTop,rBot,len,12),mat);m.position.y=-len/2;m.castShadow=true;return m;}
 function jointSphere(r,mat){return new THREE.Mesh(new THREE.SphereGeometry(r,12,12),mat);}
-function numberTex(n){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');x.clearRect(0,0,128,128);x.font='bold 92px Poppins,Arial';x.textAlign='center';x.textBaseline='middle';x.lineWidth=9;x.strokeStyle='rgba(0,0,0,.4)';x.strokeText(n,64,68);x.fillStyle='#fff';x.fillText(n,64,68);return new THREE.CanvasTexture(c);}
+function numberTex(n){const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');x.clearRect(0,0,128,128);x.font='bold 92px "Plus Jakarta Sans",Arial';x.textAlign='center';x.textBaseline='middle';x.lineWidth=9;x.strokeStyle='rgba(0,0,0,.4)';x.strokeText(n,64,68);x.fillStyle='#fff';x.fillText(n,64,68);return new THREE.CanvasTexture(c);}
 function makePlayer(jersey,shorts,skin,hair,number){
   const g=new THREE.Group();
   const jM=new THREE.MeshStandardMaterial({color:jersey,roughness:.55});
@@ -176,7 +224,7 @@ function makePlayer(jersey,shorts,skin,hair,number){
 }
 function init(){
   const cv=document.getElementById('view');
-  scene=new THREE.Scene();scene.background=new THREE.Color('#0d1830');scene.fog=new THREE.Fog('#12203c',30,70);
+  scene=new THREE.Scene();scene.background=new THREE.Color('#050a12');scene.fog=new THREE.Fog('#050a12',30,70);
   camera=new THREE.PerspectiveCamera(52,cv.clientWidth/560,0.1,200);
   renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
   renderer.setPixelRatio(Math.min(2,window.devicePixelRatio));
@@ -189,11 +237,11 @@ function init(){
   // pitch
   const ground=new THREE.Mesh(new THREE.PlaneGeometry(80,90),new THREE.MeshStandardMaterial({map:grassTex(),roughness:1}));
   ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
-  // field lines (vong cam + cham)
+  // field lines
   const lineMat=new THREE.MeshBasicMaterial({color:0xffffff});
   function line(w,d,x,z){const m=new THREE.Mesh(new THREE.PlaneGeometry(w,d),lineMat);m.rotation.x=-Math.PI/2;m.position.set(x,0.02,z);scene.add(m);}
-  line(26,0.16,0,GOAL_Z+9);           // vach 16m50 ngang
-  line(0.16,9,-13,GOAL_Z+4.5);line(0.16,9,13,GOAL_Z+4.5); // 2 canh
+  line(26,0.16,0,GOAL_Z+9);           // 16.5m
+  line(0.16,9,-13,GOAL_Z+4.5);line(0.16,9,13,GOAL_Z+4.5);
   const arc=new THREE.Mesh(new THREE.RingGeometry(4,4.16,40,1,Math.PI*0.15,Math.PI*0.7),lineMat);arc.rotation.x=-Math.PI/2;arc.position.set(0,0.02,GOAL_Z+9);scene.add(arc);
   const spotM=new THREE.Mesh(new THREE.CircleGeometry(0.18,16),lineMat);spotM.rotation.x=-Math.PI/2;spotM.position.set(0,0.02,BALL_Z);scene.add(spotM);
   // GOAL frame
@@ -202,14 +250,14 @@ function init(){
   function post(x){const m=new THREE.Mesh(new THREE.CylinderGeometry(R,R,GOAL_H,12),postMat);m.position.set(x,GOAL_H/2,GOAL_Z);m.castShadow=true;scene.add(m);}
   post(-GOAL_HW);post(GOAL_HW);
   const bar=new THREE.Mesh(new THREE.CylinderGeometry(R,R,GOAL_HW*2+R*2,12),postMat);bar.rotation.z=Math.PI/2;bar.position.set(0,GOAL_H,GOAL_Z);bar.castShadow=true;scene.add(bar);
-  // net (back + top + sides)
+  // net
   const nt=netTex();nt.repeat.set(6,3);
   const netMat=new THREE.MeshStandardMaterial({map:nt,transparent:true,opacity:.9,side:THREE.DoubleSide,depthWrite:false});
   const back=new THREE.Mesh(new THREE.PlaneGeometry(GOAL_HW*2,GOAL_H),netMat);back.position.set(0,GOAL_H/2,GOAL_Z-2.2);scene.add(back);goalNet=back;
   const top=new THREE.Mesh(new THREE.PlaneGeometry(GOAL_HW*2,2.2),netMat.clone());top.rotation.x=-Math.PI/2;top.position.set(0,GOAL_H,GOAL_Z-1.1);scene.add(top);
   const sideL=new THREE.Mesh(new THREE.PlaneGeometry(2.2,GOAL_H),netMat.clone());sideL.rotation.y=Math.PI/2;sideL.position.set(-GOAL_HW,GOAL_H/2,GOAL_Z-1.1);scene.add(sideL);
   const sideR=sideL.clone();sideR.position.x=GOAL_HW;scene.add(sideR);
-  // stands (khan dai)
+  // stands
   const ct=crowdTex();ct.wrapS=THREE.RepeatWrapping;ct.repeat.set(6,1);
   const standMat=new THREE.MeshStandardMaterial({map:ct});
   const stand=new THREE.Mesh(new THREE.BoxGeometry(70,10,3),standMat);stand.position.set(0,5,GOAL_Z-6);stand.rotation.x=-0.35;scene.add(stand);
@@ -217,15 +265,15 @@ function init(){
   ball=new THREE.Mesh(new THREE.SphereGeometry(0.36,24,24),new THREE.MeshStandardMaterial({color:0xffffff,roughness:.35,metalness:.05}));
   ball.position.set(0,0.36,BALL_Z);ball.castShadow=true;scene.add(ball);
   // aim ring
-  aimRing=new THREE.Mesh(new THREE.TorusGeometry(0.5,0.07,8,24),new THREE.MeshBasicMaterial({color:0xFFD54A}));
+  aimRing=new THREE.Mesh(new THREE.TorusGeometry(0.5,0.07,8,24),new THREE.MeshBasicMaterial({color:0x00c5cf}));
   aimRing.position.set(0,GOAL_H*0.55,GOAL_Z+0.2);scene.add(aimRing);
-  // keeper (nguoi that)
+  // keeper
   keeper=makePlayer(0xffd21e,0x222833,0xf0c39a,0x2a2016,'1');
-  keeper.userData.armL.rotation.z=1.0;keeper.userData.armR.rotation.z=-1.0;  // gang tay dang ra
+  keeper.userData.armL.rotation.z=1.0;keeper.userData.armR.rotation.z=-1.0;
   keeper.userData.legStand.rotation.z=0.12;keeper.userData.legKick.rotation.z=-0.12;
   keeper.position.set(0,0,GOAL_Z+0.6);scene.add(keeper);
-  // shooter (nhin tu sau lung)
-  shooter=makePlayer(0x1e5cff,0xffffff,0xe8b98f,0x241b12,'9');
+  // shooter
+  shooter=makePlayer(0x0e6fff,0xffffff,0xe8b98f,0x241b12,'9');
   shooter.position.set(-1.9,0,BALL_Z+0.7);shooter.scale.set(0.95,0.95,0.95);scene.add(shooter);
   camera.position.set(0.4,4.1,BALL_Z+6.6);camera.lookAt(0,1.3,GOAL_Z);
   document.getElementById('loading').style.display='none';
@@ -371,7 +419,7 @@ window.addEventListener('load',()=>{
   zone.style.bottom=(210*(TARGET-TOL)/MAXA)+'px';zone.style.height=(210*(2*TOL)/MAXA)+'px';
   const tk=document.getElementById('gticks');
   [0,40,80,120,160].forEach(v=>{const s=document.createElement('span');s.innerText=v;s.style.bottom=(210*v/MAXA)+'px';tk.appendChild(s);});
-  document.getElementById('ghint').innerHTML='mục tiêu <b style="color:#7CFFB2;">'+TARGET+'°</b><br>gập vào vùng xanh để sút';
+  document.getElementById('ghint').innerHTML='Mục tiêu <b style="color:#00c5cf;">'+TARGET+'°</b><br>gập vào vùng xanh';
   if(window.THREE){try{init();requestAnimationFrame(loop);}catch(error){document.getElementById('loading').textContent='Không khởi tạo được đồ họa 3D trên thiết bị này.';Rehab.notify(error.message);}}
   else{document.getElementById('loading').innerText='Không tải được thư viện 3D — kiểm tra mạng rồi F5.';}
 });

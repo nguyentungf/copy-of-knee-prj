@@ -57,3 +57,6 @@ bao_cao_cu/anh_giao_dien/*.jpg
 # Binaries
 *.exe
 ngrok.exe
+
+# Temporary files (Sandboxes / Demos)
+demo_websocket_temp.py

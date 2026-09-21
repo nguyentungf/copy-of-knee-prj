@@ -4,74 +4,116 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BME Rehab - Phục hồi khớp gối | Đăng nhập</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #0E82FD;
-            --primary-dark: #0A6AD4;
-            --teal: #14C0C6;
-            --ink: #1B2559;
-            --muted: #6B7A99;
-            --line: #E6ECF5;
-            --bg: #F3F7FF;
-        }
-        * { box-sizing: border-box; }
-        body { font-family: 'Poppins', 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; color: var(--ink); }
-        .card { display: grid; grid-template-columns: 1fr 1fr; width: 920px; max-width: 100%; background: #fff; border-radius: 24px; overflow: hidden; box-shadow: 0 30px 60px rgba(14,130,253,0.12); }
-
-        /* Cot trai - thuong hieu */
-        .brand { background: linear-gradient(150deg, #0E82FD 0%, #14C0C6 100%); color: #fff; padding: 48px 40px; position: relative; overflow: hidden; }
-        .brand::after { content: ""; position: absolute; right: -60px; bottom: -60px; width: 220px; height: 220px; background: rgba(255,255,255,0.10); border-radius: 50%; }
-        .brand::before { content: ""; position: absolute; right: 40px; top: -40px; width: 120px; height: 120px; background: rgba(255,255,255,0.08); border-radius: 50%; }
-        .brand .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; letter-spacing: .3px; }
-        .brand .logo span { background: #fff; color: var(--primary); width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; }
-        .brand h2 { font-size: 30px; line-height: 1.25; margin: 38px 0 14px; font-weight: 700; }
-        .brand p { color: rgba(255,255,255,.88); font-size: 14px; line-height: 1.7; }
-        .brand .feats { margin-top: 28px; display: flex; flex-direction: column; gap: 14px; }
-        .brand .feat { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 500; }
-        .brand .feat i { width: 30px; height: 30px; background: rgba(255,255,255,.18); border-radius: 9px; display: grid; place-items: center; font-style: normal; }
-
-        /* Cot phai - form */
-        .panel { padding: 46px 44px; }
-        .panel h1 { font-size: 24px; font-weight: 700; margin: 0 0 4px; }
-        .subtitle { color: var(--muted); margin-bottom: 26px; font-size: 14px; }
-        .tabs { display: flex; gap: 6px; background: #F1F5FC; padding: 6px; border-radius: 12px; margin-bottom: 26px; }
-        .tab { flex: 1; text-align: center; padding: 11px; cursor: pointer; color: var(--muted); font-weight: 600; font-size: 14px; border-radius: 9px; transition: .2s; }
-        .tab.active { color: #fff; background: var(--primary); box-shadow: 0 6px 14px rgba(14,130,253,.30); }
-        .form-panel { display: none; }
-        .form-panel.active { display: block; animation: fade .3s; }
-        @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-        label { display: block; margin-bottom: 7px; color: var(--ink); font-size: 13px; font-weight: 600; }
-        input { width: 100%; padding: 13px 15px; margin-bottom: 16px; border-radius: 11px; border: 1.5px solid var(--line); box-sizing: border-box; font-family: inherit; font-size: 14px; color: var(--ink); transition: .2s; background: #FBFCFF; }
-        input:focus { outline: none; border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(14,130,253,.10); }
-        button { width: 100%; padding: 14px; border: none; border-radius: 11px; background: var(--primary); color: white; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; transition: .2s; box-shadow: 0 10px 20px rgba(14,130,253,.25); }
-        button:hover { background: var(--primary-dark); transform: translateY(-1px); }
-        .alert { padding: 12px 14px; border-radius: 11px; margin-bottom: 20px; font-size: 14px; text-align: center; font-weight: 500; }
-        .alert-success { background: #E3F9EC; color: #0F9D58; }
-        .alert-danger { background: #FDECEC; color: #E0413A; }
-        @media (max-width: 760px) { .card { grid-template-columns: 1fr; } .brand { display: none; } }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='rehab.css') }}">
     <script src="{{ url_for('static', filename='rehab.js') }}"></script>
+    <style>
+        body { 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; padding: 20px; background: var(--pale); 
+        }
+        .auth-card { 
+            display: grid; grid-template-columns: 1fr 1fr; width: 1000px; max-width: 100%; 
+            background: #fff; border-radius: var(--radius); overflow: hidden; 
+            box-shadow: 0 14px 44px rgba(16, 35, 62, 0.08); 
+        }
+        .brand-side { 
+            background: radial-gradient(circle at 0% 0%, #0e6fff 0%, #091321 100%); 
+            color: #fff; padding: 50px 45px; position: relative; overflow: hidden; 
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .brand-side::after { 
+            content: ""; position: absolute; right: -80px; bottom: -80px; 
+            width: 300px; height: 300px; background: rgba(0,197,207,0.15); border-radius: 50%; filter: blur(40px);
+        }
+        .brand-side::before { 
+            content: ""; position: absolute; left: 40px; top: -40px; 
+            width: 150px; height: 150px; background: rgba(13,186,120,0.15); border-radius: 50%; filter: blur(30px);
+        }
+        .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 22px; letter-spacing: -0.5px; position: relative; z-index: 2; }
+        .logo .brand-mark { background: #fff; padding: 6px; border-radius: 8px; }
+        
+        .brand-side h2 { font-size: 36px; line-height: 1.15; margin: 40px 0 16px; font-weight: 800; letter-spacing: -1.2px; position: relative; z-index: 2; }
+        .brand-side p { color: #a4b3c4; font-size: 15px; line-height: 1.6; position: relative; z-index: 2; margin: 0; }
+        
+        .feats { margin-top: 40px; display: flex; flex-direction: column; gap: 18px; position: relative; z-index: 2; }
+        .feat { display: flex; align-items: center; gap: 14px; font-size: 14px; font-weight: 600; color: #d6e1ed; }
+        .feat i { 
+            width: 32px; height: 32px; background: rgba(255,255,255,.1); 
+            border: 1px solid rgba(255,255,255,.15); border-radius: 10px; 
+            display: grid; place-items: center; font-style: normal; font-size: 15px;
+        }
+
+        .panel-side { padding: 50px 48px; background: #fff; }
+        .panel-side h1 { font-size: 26px; font-weight: 800; margin: 0 0 6px; letter-spacing: -0.8px; }
+        .subtitle { color: var(--muted); margin-bottom: 28px; font-size: 14px; }
+        
+        .tabs { display: flex; gap: 6px; background: #f2f7ff; padding: 6px; border-radius: 12px; margin-bottom: 28px; }
+        .tab { 
+            flex: 1; text-align: center; padding: 12px; cursor: pointer; 
+            color: #6a7b92; font-weight: 700; font-size: 13px; border-radius: 9px; transition: .2s; border: none; background: transparent; 
+        }
+        .tab.active { color: var(--blue); background: #fff; box-shadow: 0 4px 12px rgba(14,111,255,.1); }
+        
+        .form-panel { display: none; }
+        .form-panel.active { display: block; animation: fade .3s; }
+        @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+        
+        label { display: block; margin-bottom: 8px; color: var(--ink); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        input { 
+            width: 100%; padding: 14px 16px; margin-bottom: 20px; border-radius: 12px; 
+            border: 1px solid var(--line); box-sizing: border-box; font-family: inherit; 
+            font-size: 14px; color: var(--ink); transition: .2s; background: #f8fafc; font-weight: 500;
+        }
+        input:focus { outline: none; border-color: var(--blue); background: #fff; box-shadow: 0 0 0 4px rgba(14,111,255,.12); }
+        input::placeholder { color: #a1b0c0; font-weight: 400; }
+        
+        .btn-submit { 
+            width: 100%; padding: 15px; border: none; border-radius: 12px; 
+            background: var(--blue); color: white; font-size: 15px; font-weight: 700; 
+            cursor: pointer; font-family: inherit; transition: .2s; box-shadow: 0 8px 24px rgba(14,111,255,.25); margin-top: 10px;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(14,111,255,.35); filter: brightness(1.05); }
+        
+        .alert { padding: 14px 16px; border-radius: 12px; margin-bottom: 22px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        .alert::before { content: 'i'; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; font-family: 'DM Mono'; font-size: 10px; color: #fff; }
+        .alert-success { background: #e6f8f0; color: #098761; border: 1px solid #bceadd; }
+        .alert-success::before { background: #0dba78; }
+        .alert-danger { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+        .alert-danger::before { background: #ef4444; }
+
+        @media (max-width: 860px) { 
+            .auth-card { grid-template-columns: 1fr; } 
+            .brand-side { display: none; } 
+            .panel-side { padding: 30px; }
+        }
+    </style>
 </head>
 <body>
-    <noscript><p class="empty-state">Vui lòng bật JavaScript để dùng dữ liệu trực tiếp và các nút điều khiển.</p></noscript>
-    <div class="card">
-        <div class="brand">
-            <div class="logo"><span>🦴</span> BME Rehab</div>
-            <h2>Phục hồi chức năng<br>khớp gối thông minh</h2>
-            <p>Theo dõi tầm vận động (ROM) bằng camera AI và cảm biến IMU, đồng hành cùng bác sĩ trong suốt quá trình hồi phục.</p>
+    <noscript><p class="empty-state">Vui lòng bật JavaScript để dùng ứng dụng.</p></noscript>
+    <div class="auth-card">
+        <div class="brand-side">
+            <div class="logo">
+                <div class="brand-mark">
+                    <span style="display:inline-block; width:4px; height:10px; background:var(--blue); border-radius:4px;"></span>
+                    <span style="display:inline-block; width:4px; height:16px; background:var(--cyan); border-radius:4px; margin:0 2px;"></span>
+                    <span style="display:inline-block; width:4px; height:12px; background:var(--green); border-radius:4px;"></span>
+                </div>
+                BME Rehab
+            </div>
+            <h2>Phục hồi chức năng<br>Khớp gối AI</h2>
+            <p>Hệ thống theo dõi tầm vận động (ROM) tích hợp Computer Vision và cảm biến IMU y tế.</p>
             <div class="feats">
-                <div class="feat"><i>📷</i> Đo góc gập bằng camera MediaPipe</div>
-                <div class="feat"><i>🦵</i> Cảm biến IMU không dây độ chính xác cao</div>
-                <div class="feat"><i>📊</i> Biểu đồ tiến trình &amp; tư vấn từ bác sĩ</div>
+                <div class="feat"><i>📷</i> Đo góc tự động qua Camera 3D</div>
+                <div class="feat"><i>🦵</i> Cảm biến IMU không dây độ trễ thấp</div>
+                <div class="feat"><i>📊</i> Biểu đồ phục hồi chuẩn y khoa</div>
             </div>
         </div>
 
-        <div class="panel">
-            <h1>Chào mừng trở lại 👋</h1>
-            <div class="subtitle">Đăng nhập để tiếp tục buổi tập của bạn</div>
+        <div class="panel-side">
+            <h1>Chào mừng trở lại</h1>
+            <div class="subtitle">Đăng nhập để theo dõi lộ trình của bạn</div>
 
             {% if msg %}
                 <div class="alert alert-{{ category }}">{{ msg }}</div>
@@ -79,34 +121,42 @@
 
             <div class="tabs" role="tablist" aria-label="Tài khoản">
                 <button type="button" class="tab active" role="tab" id="login-tab" aria-controls="login-panel" aria-selected="true" onclick="switchTab('login-panel', this)">Đăng nhập</button>
-                <button type="button" class="tab" role="tab" id="register-tab" aria-controls="register-panel" aria-selected="false" tabindex="-1" onclick="switchTab('register-panel', this)">Đăng ký bệnh nhân</button>
+                <button type="button" class="tab" role="tab" id="register-tab" aria-controls="register-panel" aria-selected="false" tabindex="-1" onclick="switchTab('register-panel', this)">Đăng ký mới</button>
             </div>
 
             <div id="login-panel" class="form-panel active" role="tabpanel" aria-labelledby="login-tab">
                 <form action="/login" method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <label for="login-username">Tên đăng nhập</label>
-                    <input id="login-username" type="text" name="username" autocomplete="username" maxlength="64" autocapitalize="none" spellcheck="false" placeholder="Nhập tài khoản" required>
+                    <input id="login-username" type="text" name="username" autocomplete="username" maxlength="64" autocapitalize="none" spellcheck="false" placeholder="Tên đăng nhập" required>
                     <label for="login-password">Mật khẩu</label>
                     <input id="login-password" type="password" name="password" autocomplete="current-password" maxlength="256" placeholder="Nhập mật khẩu" required>
-                    <button type="submit">Đăng nhập</button>
+                    <button class="btn-submit" type="submit">Truy cập Dashboard</button>
                 </form>
             </div>
 
             <div id="register-panel" class="form-panel" role="tabpanel" aria-labelledby="register-tab" hidden>
                 <form action="/register" method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <label for="register-username">Tên tài khoản (3–64 ký tự, không có khoảng trắng)</label>
-                    <input id="register-username" type="text" name="username" autocomplete="username" minlength="3" maxlength="64" pattern="\S+" autocapitalize="none" spellcheck="false" placeholder="Ví dụ: vanan123" required>
-                    <label for="register-password">Mật khẩu (ít nhất 10 ký tự)</label>
+                    <label for="register-username">Tên đăng nhập (viết liền)</label>
+                    <input id="register-username" type="text" name="username" autocomplete="username" minlength="3" maxlength="64" pattern="\S+" autocapitalize="none" spellcheck="false" placeholder="Ví dụ: nva123" required>
+                    <label for="register-password">Mật khẩu (tối thiểu 10 ký tự)</label>
                     <input id="register-password" type="password" name="password" autocomplete="new-password" minlength="10" maxlength="256" placeholder="Tạo mật khẩu" required>
                     <label for="register-name">Họ và tên bệnh nhân</label>
                     <input id="register-name" type="text" name="name" autocomplete="name" maxlength="120" placeholder="Ví dụ: Nguyễn Văn An" required>
-                    <label for="register-age">Tuổi</label>
-                    <input id="register-age" type="number" name="age" min="1" max="120" step="1" inputmode="numeric" required>
-                    <label for="register-week">Tuần phục hồi hiện tại</label>
-                    <input id="register-week" type="number" name="week" min="0" max="104" step="1" inputmode="numeric" required>
-                    <button type="submit">Đăng ký tài khoản</button>
+                    
+                    <div style="display:flex; gap:16px;">
+                        <div style="flex:1;">
+                            <label for="register-age">Tuổi</label>
+                            <input id="register-age" type="number" name="age" min="1" max="120" step="1" inputmode="numeric" required>
+                        </div>
+                        <div style="flex:1;">
+                            <label for="register-week">Tuần phục hồi</label>
+                            <input id="register-week" type="number" name="week" min="0" max="104" step="1" inputmode="numeric" required>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-submit" type="submit">Tạo hồ sơ bệnh án</button>
                 </form>
             </div>
         </div>
